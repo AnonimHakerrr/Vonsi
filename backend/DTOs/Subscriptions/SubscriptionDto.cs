@@ -13,3 +13,4 @@ namespace backend.DTOs.Subscriptions
         public bool Popular { get; set; }
     }
 }
+
