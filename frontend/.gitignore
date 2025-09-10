@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# .NET тимчасові файли
+backend/bin/
+backend/obj/
+*.user
+*.vs
+backend/
