@@ -1,4 +1,4 @@
-namespace AuthApiMongo.Config
+namespace backend.Config
 {
     public class MongoDbSettings
     {
