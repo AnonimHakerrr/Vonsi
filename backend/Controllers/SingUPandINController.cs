@@ -24,21 +24,24 @@ namespace backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(SignUpDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.FirstName) || string.IsNullOrWhiteSpace(dto.Password))
-                return BadRequest("First name and password required.");
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest("Email and password required.");
+             
 
-        
             var user = new User
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                PasswordHash = PasswordHasher.Hash(dto.Password)
+                PasswordHash = PasswordHasher.Hash(dto.Password),
+                Email = dto.Email,
+                Phone = dto.Phone
+
             };
 
             await _userService.CreateAsync(user);
 
             return Ok(new UserResponseDto { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName });
         }
- 
+
     }
 }

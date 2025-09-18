@@ -1,4 +1,5 @@
 using backend.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,8 +15,18 @@ namespace backend.Services
             _users = mongoDb.GetCollection<User>("Users");
         }
 
-        public Task<List<User>> GetAllAsync() => _users.Find(u => true).ToListAsync();
-        public Task<User> GetByIdAsync(string id) => _users.Find(u => u.Id == id).FirstOrDefaultAsync();
-        public Task CreateAsync(User user) => _users.InsertOneAsync(user);
+        public async Task<User> GetByIdAsync(string id)
+        {
+            if (!ObjectId.TryParse(id, out var objectId))
+                return null;
+
+            return await _users.Find(u => u.Id == objectId.ToString()).FirstOrDefaultAsync();
+        }
+        public Task<User> GetByEmailAsync(string email) =>_users.Find(u => u.Email == email).FirstOrDefaultAsync();
+
+        public async Task CreateAsync(User user)
+        {
+               await _users.InsertOneAsync(user);
+        }
     }
 }
