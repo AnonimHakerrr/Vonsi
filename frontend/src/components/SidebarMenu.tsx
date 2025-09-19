@@ -88,7 +88,7 @@ export function SidebarMenu() {
               <path d="M 505 145 L 508 152 L 516 197 L 503 225 L 501 246 L 519 231 L 523 230 L 551 296 L 548 297 L 530 284 L 527 284 L 495 309 L 491 310 L 490 307 L 501 285 L 497 285 L 465 298 L 441 305 L 441 298 L 460 251 L 431 276 L 428 276 L 411 246 L 499 149 Z" />
             </g>
           </svg>
-          <h3 className="text-sm font-bold leading-tight break-words">
+          <h3 className="text-sm font-bold leading-tight break-words text-center">
             VONSI RESORT
           </h3>
         </div>
