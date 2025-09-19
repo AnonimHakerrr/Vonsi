@@ -25,16 +25,16 @@ export default function HomePage() {
           <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-6">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Snowflake className="h-8 w-8 text-yellow-400" />
-              <Badge className="bg-yellow-400 text-black text-lg px-4 py-2">
-                Зимовий сезон 2024/25
+              <Badge className="bg-yellow-400 text-black text-lg px-4 py-2 font-semibold">
+                Зимовий сезон 2025/26
               </Badge>
             </div>
-            <h1 className="text-6xl md:text-8xl font-bold mb-6 text-balance">
+            <h1 className="!text-[clamp(2rem,5vw,11rem)] !font-black !mb-7 !text-balance leading-tight">
               Ваш ідеальний
               <span className="text-yellow-400"> зимовий </span>
               відпочинок
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-pretty max-w-2xl mx-auto leading-relaxed">
+            <p className="font-semibold text-[clamp(1rem,2.5vw,1.5rem)] md:text-[clamp(1rem,2.5vw,1.5rem)] mb-8 text-pretty max-w-2xl mx-auto leading-relaxed">
               Насолоджуйтесь найкращими лижними трасами, комфортним готелем та
               незабутніми враженнями в серці Карпат
             </p>

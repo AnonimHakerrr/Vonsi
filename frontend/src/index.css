@@ -1,20 +1,16 @@
 @import "tailwindcss";
 
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
 
+@layer base {
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif; /* додаємо сюди */
+  }
 
-body {
-  font-family: "Montserrat", sans-serif;
-  margin: 0px; /* прибирає зовнішні відступи */
-  padding: 0px; /* прибирає внутрішні відступи */
-  box-sizing: border-box; /* робить ширину/висоту більш передбачуваною */
+  body {
+    font-family: 'Montserrat', sans-serif !important; /* примусове застосування */
+  }
 }

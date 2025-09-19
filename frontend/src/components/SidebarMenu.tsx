@@ -39,7 +39,7 @@ export function SidebarMenu() {
         <Button
           variant="ghost"
           size="sm"
-          className="fixed top-4 left-4 z-50 md:hidden bg-black/80 text-white hover:bg-black"
+          className="!w-auto !h-auto p-2 fixed top-4 left-4 z-50 md:hidden bg-black/80 text-white hover:bg-black flex items-center justify-center rounded-full"
           onClick={() => setIsOpen(true)}
         >
           <Menu className="h-5 w-5" />
