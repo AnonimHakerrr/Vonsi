@@ -105,7 +105,7 @@ export function SidebarMenu() {
                   <Link
                     to={item.href}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                      "flex items-center gap-2 px-3 py-2 mb-2 rounded-lg transition-colors",
                       isActive
                         ? "bg-yellow-400 text-black"
                         : "hover:bg-gray-800 text-gray-300 hover:text-white"

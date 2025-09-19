@@ -1,12 +1,14 @@
 
-import { SidebarMenu } from './components/SidebarMenu'
-import './App.css'
+//import { SidebarMenu } from './components/SidebarMenu'
+import HomePage from "../src/pages/Homepage"; // ✅ правильний синтаксис
+
+import './index.css'
 
 function App() {
 
   return (
     <>
-      <SidebarMenu />
+      <HomePage />
     </>
   )
 }
