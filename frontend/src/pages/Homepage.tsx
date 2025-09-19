@@ -1,4 +1,3 @@
-
 import { Button } from "../components/Button";
 import { Card, CardContent } from "../components/Card";
 import { Badge } from "../components/Badge";
@@ -69,7 +68,9 @@ export default function HomePage() {
                 <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Mountain className="h-10 w-10 text-black" />
                 </div>
-                <h3 className="font-black mb-4 text-[clamp(1rem,4vw,2.5rem)]">15 лижних трас</h3>
+                <h3 className="font-black mb-4 text-[clamp(1rem,4vw,2.5rem)]">
+                  15 лижних трас
+                </h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Від початкового до експертного рівня. Сучасні підйомники та
                   ідеально підготовлені траси
@@ -82,9 +83,12 @@ export default function HomePage() {
                 <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Snowflake className="h-10 w-10 text-black" />
                 </div>
-                <h3 className="font-black mb-4 text-[clamp(1rem,4vw,2.5rem)]">Комфортний готель</h3>
+                <h3 className="font-black mb-4 text-[clamp(1rem,4vw,2.5rem)]">
+                  Комфортний готель
+                </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Затишні номери з панорамним видом на гори, ресторан та SPA-центр
+                  Затишні номери з панорамним видом на гори, ресторан та
+                  SPA-центр
                 </p>
               </CardContent>
             </Card>
@@ -94,7 +98,9 @@ export default function HomePage() {
                 <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Star className="h-10 w-10 text-black" />
                 </div>
-                <h3 className="font-black mb-4 text-[clamp(1rem,4vw,2.5rem)]">Прокат обладнання</h3>
+                <h3 className="font-black mb-4 text-[clamp(1rem,4vw,2.5rem)]">
+                  Прокат обладнання
+                </h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Найновіше лижне обладнання від провідних брендів. Професійна
                   підгонка та консультації
@@ -106,27 +112,27 @@ export default function HomePage() {
 
         {/* Stats Section */}
         <section className="bg-black text-white py-20 px-6">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-center">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl md:text-5xl font-bold text-yellow-400 mb-2">
+              <div className="text-4xl md:text-5xl font-black text-yellow-400 mb-2 border-4 border-yellow-400 rounded-full inline-block px-4 py-2">
                 15
               </div>
               <div className="text-lg">Лижних трас</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold text-yellow-400 mb-2">
+              <div className="text-4xl md:text-5xl font-black text-yellow-400 mb-2 border-4 border-yellow-400 rounded-full inline-block px-4 py-2">
                 120
               </div>
               <div className="text-lg">Номерів готелю</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold text-yellow-400 mb-2">
+              <div className="text-4xl md:text-5xl font-black text-yellow-400 mb-2 border-4 border-yellow-400 rounded-full inline-block px-4 py-2">
                 5
               </div>
               <div className="text-lg">Зірок сервісу</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold text-yellow-400 mb-2">
+              <div className="text-4xl md:text-5xl font-black text-yellow-400 mb-2 border-4 border-yellow-400 rounded-full inline-block px-4 py-2">
                 24/7
               </div>
               <div className="text-lg">Підтримка гостей</div>
@@ -181,10 +187,16 @@ export default function HomePage() {
               © 2024 VONSI RESORT. Всі права захищені.
             </p>
             <div className="flex justify-center gap-8">
-              <a href="/privacy" className="hover:text-yellow-400 transition-colors">
+              <a
+                href="/privacy"
+                className="hover:text-yellow-400 transition-colors"
+              >
                 Політика конфіденційності
               </a>
-              <a href="/terms" className="hover:text-yellow-400 transition-colors">
+              <a
+                href="/terms"
+                className="hover:text-yellow-400 transition-colors"
+              >
                 Умови використання
               </a>
             </div>
