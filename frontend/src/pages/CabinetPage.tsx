@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "../components/Button";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -47,6 +48,11 @@ export default function DashboardPage() {
   const [rentalDetailsModal, setRentalDetailsModal] = useState<string | null>(
     null
   );
+  const navigate = useNavigate();
+
+  const handleGoHome = () => {
+    navigate("/"); // перенаправляє на головну сторінку
+  };
 
   const handleSettingsChange = (
     field: keyof typeof userData,
@@ -129,6 +135,7 @@ export default function DashboardPage() {
               variant="outline"
               size="sm"
               className="!w-auto !inline-flex !px-3 !py-1.5 !rounded-md !items-center !justify-center !gap-1.5 !hover:bg-yellow-50 !text-xs !transition-all"
+              onClick={handleGoHome}
             >
               <LogOut className="!h-4 !w-4" />
               Вийти
@@ -520,9 +527,11 @@ export default function DashboardPage() {
         open={!!bookingDetailsModal}
         onOpenChange={() => setBookingDetailsModal(null)}
       >
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl bg-white">
           <DialogHeader>
-            <DialogTitle>Деталі бронювання</DialogTitle>
+            <DialogTitle className="!font-semibold">
+              Деталі бронювання
+            </DialogTitle>
             <DialogDescription>
               Повна інформація про ваше бронювання
             </DialogDescription>
@@ -531,7 +540,7 @@ export default function DashboardPage() {
           {booking ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">{booking.name}</h3>
+                <h3 className="text-xl !font-semibold">{booking.name}</h3>
                 <Badge
                   className={
                     booking.status === "confirmed"
@@ -548,9 +557,10 @@ export default function DashboardPage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center gap-2">
-                        <MapPin className="h-4 w-4" /> Інформація про номер
-                      </h4>
+                      <h5 className="font-semibold mb-2 flex items-center gap-2">
+                        <MapPin className="!h-5 !w-5 text-yellow-400" />{" "}
+                        Інформація про номер
+                      </h5>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Номер:</span>
@@ -586,9 +596,10 @@ export default function DashboardPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center gap-2">
-                        <Clock className="h-4 w-4" /> Час заїзду/виїзду
-                      </h4>
+                      <h5 className="font-semibold mb-2 flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-yellow-400" /> Час
+                        заїзду/виїзду
+                      </h5>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Заїзд:</span>
@@ -606,9 +617,10 @@ export default function DashboardPage() {
                     </div>
 
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" /> Вартість
-                      </h4>
+                      <h5 className="font-semibold mb-2 flex items-center gap-2">
+                        <CreditCard className="h-5 w-5 text-yellow-400" />{" "}
+                        Вартість
+                      </h5>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">За ніч:</span>
@@ -622,9 +634,9 @@ export default function DashboardPage() {
                     </div>
 
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center gap-2">
-                        <Phone className="h-4 w-4" /> Контакти
-                      </h4>
+                      <h5 className="font-semibold mb-2 flex items-center gap-2">
+                        <Phone className="h-5 w-5 text-yellow-400" /> Контакти
+                      </h5>
                       <p className="text-sm">{booking.details.contact}</p>
                     </div>
                   </div>
@@ -697,9 +709,9 @@ export default function DashboardPage() {
         open={!!rentalDetailsModal}
         onOpenChange={() => setRentalDetailsModal(null)}
       >
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl bg-white">
           <DialogHeader>
-            <DialogTitle>Деталі оренди</DialogTitle>
+            <DialogTitle className="!font-semibold">Деталі оренди</DialogTitle>
             <DialogDescription>
               Повна інформація про оренду обладнання
             </DialogDescription>
@@ -708,7 +720,7 @@ export default function DashboardPage() {
           {rental ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">{rental.item}</h3>
+                <h3 className="text-xl !font-bold">{rental.item}</h3>
                 <Badge
                   className={
                     rental.status === "active"
@@ -726,39 +738,46 @@ export default function DashboardPage() {
                 {/* Ліва колонка */}
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <Package className="h-4 w-4" /> Обладнання
-                    </h4>
+                    <h5 className="font-semibold mb-2 flex items-center gap-2">
+                      <Package className="h-5 w-5 text-yellow-400" /> Обладнання
+                    </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Назва:</span>
-                        <span className="text-right">
+                      <div className="">
+                        <span className="text-muted-foreground">Назва: </span>
+                        <span className="break-words">
                           {rental.details.equipment}
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Розмір:</span>
-                        <span>{rental.details.size}</span>
+                      <div className="">
+                        <span className="text-muted-foreground">Розмір: </span>
+                        <span className="break-words">
+                          {rental.details.size}
+                        </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Стан:</span>
+                      <div className="">
+                        <span className="text-muted-foreground">Стан: </span>
                         <span>{rental.details.condition}</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" /> Вартість
-                    </h4>
+                    <h5 className="font-semibold mb-2 flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-yellow-400" />{" "}
+                      Вартість
+                    </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Оренда:</span>
-                        <span>{rental.price}</span>
+                      <div className="">
+                        <span className="text-muted-foreground">Оренда: </span>
+                        <span className="break-words font-black">
+                          {rental.price}
+                        </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Застава:</span>
-                        <span>{rental.details.deposit}</span>
+                      <div className="">
+                        <span className="text-muted-foreground">Застава: </span>
+                        <span className="break-words">
+                          {rental.details.deposit}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -767,21 +786,22 @@ export default function DashboardPage() {
                 {/* Права колонка */}
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" /> Місце видачі/повернення
-                    </h4>
+                    <h5 className="font-semibold mb-2 flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-yellow-400" />
+                      Видача/Повернення
+                    </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Видача:</span>
-                        <span className="text-right">
+                      <div className="">
+                        <span className="text-muted-foreground">Видача: </span>
+                        <span className="break-words">
                           {rental.details.pickupLocation}
                         </span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="">
                         <span className="text-muted-foreground">
-                          Повернення:
+                          Повернення:{" "}
                         </span>
-                        <span className="text-right">
+                        <span className="break-wordst">
                           {rental.details.returnLocation}
                         </span>
                       </div>
@@ -789,21 +809,22 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <Clock className="h-4 w-4" /> Час видачі/повернення
-                    </h4>
+                    <h5 className="font-semibold mb-2 flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-yellow-400" /> Час
+                      видачі/повернення
+                    </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Видача:</span>
-                        <span className="text-right">
+                      <div className="">
+                        <span className="text-muted-foreground">Видача: </span>
+                        <span className="break-words">
                           {rental.details.pickupTime}
                         </span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="">
                         <span className="text-muted-foreground">
-                          Повернення:
+                          Повернення:{" "}
                         </span>
-                        <span className="text-right">
+                        <span className="break-words">
                           {rental.details.returnTime}
                         </span>
                       </div>
@@ -811,9 +832,9 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <Phone className="h-4 w-4" /> Контакти
-                    </h4>
+                    <h5 className="font-semibold mb-2 flex items-center gap-2">
+                      <Phone className="h-5 w-5 text-yellow-400" /> Контакти
+                    </h5>
                     <p className="text-sm">{rental.details.contact}</p>
                   </div>
                 </div>
@@ -824,16 +845,49 @@ export default function DashboardPage() {
           )}
         </DialogContent>
       </Dialog>
+
       {/* Settings Modal */}
       <Dialog open={settingsModalOpen} onOpenChange={setSettingsModalOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Налаштування профілю</DialogTitle>
             <DialogDescription>
               Редагуйте дані вашого профілю.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+
+          <div className="space-y-4 flex flex-col ">
+            {/* Аватарка */}
+            <div className="flex items-center gap-4">
+              <img
+                src={editableUserData.avatar || "/default-avatar.png"}
+                alt="Аватарка"
+                className="w-16 h-16 rounded-full object-cover border border-gray-200"
+              />
+              <label className="cursor-pointer px-2 py-1 bg-yellow-400 text-black rounded-lg  hover:bg-yellow-500">
+                Змінити аватар
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setEditableUserData({
+                        ...editableUserData,
+                        avatar: reader.result as string,
+                      });
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
+            </div>
+
+            {/* Поля редагування профілю */}
             <div>
               <Label>Ім’я</Label>
               <Input
@@ -841,6 +895,7 @@ export default function DashboardPage() {
                 onChange={(e) => handleSettingsChange("name", e.target.value)}
               />
             </div>
+
             <div>
               <Label>Email</Label>
               <Input
@@ -848,6 +903,7 @@ export default function DashboardPage() {
                 onChange={(e) => handleSettingsChange("email", e.target.value)}
               />
             </div>
+
             <div>
               <Label>Телефон</Label>
               <Input
@@ -855,9 +911,15 @@ export default function DashboardPage() {
                 onChange={(e) => handleSettingsChange("phone", e.target.value)}
               />
             </div>
-            <Button onClick={handleSaveSettings}>
-              <Save className="h-4 w-4 mr-1" /> Зберегти
-            </Button>
+
+            <div className="flex justify-center">
+              <Button
+                onClick={handleSaveSettings}
+                className="!flex !items-center !justify-center  px-2 py-1 bg-yellow-400 text-black !rounded-lg  hover:bg-yellow-500 !w-50"
+              >
+                <Save className="h-5 w-5 " /> Зберегти
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
