@@ -72,7 +72,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="!bg-white !border-b !px-4 !py-2 sm:!px-6 sm:!py-3">
+      <header className="!bg-white !border-b  sm:!px-6 sm:!py-0">
         <div className="!max-w-7xl !mx-auto !flex !flex-col sm:!flex-row !items-center !justify-between !gap-2 sm:!gap-0">
           <a
             href="/"
@@ -179,7 +179,7 @@ export default function DashboardPage() {
           onValueChange={setActiveTab}
           className="space-y-40 sm:space-y-6 md:space-y-4 lg:space-y-10"
         >
-          <TabsList className="flex flex-wrap justify-start bg-gray-200 rounded-lg gap-3 px-1 py-0.5">
+          <TabsList className="flex flex-wrap justify-start bg-gray-200 rounded-lg gap-3 px-1 py-0">
             <TabsTrigger
               value="overview"
               className="!flex-1 !min-w-[120px] !flex !items-center !justify-center !rounded-lg px-2 py-1
@@ -273,25 +273,25 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
-                  <a href="/booking">
-                    <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 h-12">
-                      <Calendar className="h-5 w-5 mr-2" />
+                  <a href="/booking" className="!no-underline">
+                    <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg">
+                      <Calendar className="!h-5 !w-5 " />
                       Забронювати номер
                     </Button>
                   </a>
-                  <a href="/rental">
+                  <a href="/rental" className="!no-underline">
                     <Button
                       variant="outline"
-                      className="w-full h-12 bg-transparent"
+                      className="w-full  text-black !hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg"
                     >
                       <Snowflake className="h-5 w-5 mr-2" />
                       Орендувати обладнання
                     </Button>
                   </a>
-                  <a href="/ski-passes">
+                  <a href="/ski-passes" className="!no-underline">
                     <Button
                       variant="outline"
-                      className="w-full h-12 bg-transparent"
+                      className="w-full  text-black !hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg"
                     >
                       <QrCode className="h-5 w-5 mr-2" />
                       Купити абонемент
