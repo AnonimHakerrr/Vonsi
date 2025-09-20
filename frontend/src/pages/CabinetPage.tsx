@@ -177,18 +177,45 @@ export default function DashboardPage() {
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="space-y-6"
+          className="space-y-40 sm:space-y-6 md:space-y-4 lg:space-y-10"
         >
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Огляд</TabsTrigger>
-            <TabsTrigger value="bookings">Бронювання</TabsTrigger>
-            <TabsTrigger value="rentals">Оренда</TabsTrigger>
-            <TabsTrigger value="ski-passes">Абонементи</TabsTrigger>
-            <TabsTrigger value="membership">Членство</TabsTrigger>
+          <TabsList className="flex flex-wrap justify-start bg-gray-200 rounded-lg gap-3 px-1 py-0.5">
+            <TabsTrigger
+              value="overview"
+              className="!flex-1 !min-w-[120px] !flex !items-center !justify-center !rounded-lg px-2 py-1
+               !border !border-transparent
+               data-[state=active]:bg-yellow-400 hover:bg-gray-100"
+            >
+              Огляд
+            </TabsTrigger>
+            <TabsTrigger
+              value="bookings"
+              className="!flex-1 !min-w-[120px] !flex !items-center !justify-center !rounded-lg px-2 py-1
+               !border !border-transparent
+               data-[state=active]:bg-yellow-400 hover:bg-gray-100"
+            >
+              Бронювання
+            </TabsTrigger>
+            <TabsTrigger
+              value="rentals"
+              className="!flex-1 !min-w-[120px] !flex items-center !justify-center !rounded-lg px-2 py-1
+               !border !border-transparent
+               data-[state=active]:bg-yellow-400 hover:bg-gray-100"
+            >
+              Оренда
+            </TabsTrigger>
+            <TabsTrigger
+              value="ski-passes"
+              className="!flex-1 !min-w-[120px] !flex items-center !justify-center !rounded-lg px-2 py-1
+               !border !border-transparent
+               data-[state=active]:bg-yellow-400 hover:bg-gray-100"
+            >
+              Абонементи
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="overview" className="space-y-6 ">
             <div className="grid md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader className="pb-3">
