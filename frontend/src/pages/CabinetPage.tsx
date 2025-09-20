@@ -305,10 +305,10 @@ export default function DashboardPage() {
           {/* Bookings Tab */}
           <TabsContent value="bookings" className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Мої бронювання</h2>
-              <a href="/booking">
-                <Button className="bg-yellow-400 text-black hover:bg-yellow-500">
-                  <Calendar className="h-4 w-4 mr-2" />
+              <h2 className="text-2xl !font-bold">Мої бронювання</h2>
+              <a href="/booking" className="!no-underline">
+                <Button className="!px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold ">
+                  <Calendar className="!h-5 !w-5" />
                   Нове бронювання
                 </Button>
               </a>
@@ -348,16 +348,17 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col !items-center !justify-center">
                         <div className="text-2xl font-bold mb-2">
                           {booking.price}
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
+                          className="!flex !items-center !justify-center !rounded-lg"
                           onClick={() => setBookingDetailsModal(booking.id)}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
+                          <Eye className="h-4 w-4" />
                           Деталі
                         </Button>
                       </div>
