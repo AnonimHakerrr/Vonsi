@@ -3,7 +3,7 @@ import { Card, CardContent } from "../components/Card";
 import { Badge } from "../components/Badge";
 import { SidebarMenu } from "../components/SidebarMenu";
 import { Mountain, Snowflake, MapPin, Phone, Mail, Star } from "lucide-react";
-import bgImage from "../assets/fon.jpg";
+import bgImage from "../assets/font1.png";
 import resortImage from "../assets/resort.jpg";
 
 export default function HomePage() {
@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-6">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Snowflake className="h-8 w-8 text-yellow-400" />
-              <Badge className="bg-yellow-400 text-black text-lg px-4 py-2 font-semibold">
+              <Badge className="bg-yellow-400/50  text-black text-lg px-4 py-2 font-semibold">
                 Зимовий сезон 2025/26
               </Badge>
             </div>

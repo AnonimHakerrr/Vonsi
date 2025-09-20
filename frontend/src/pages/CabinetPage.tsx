@@ -434,10 +434,10 @@ export default function DashboardPage() {
           {/* Ski Passes Tab */}
           <TabsContent value="ski-passes" className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Мої абонементи</h2>
-              <a href="/ski-passes">
-                <Button className="bg-yellow-400 text-black hover:bg-yellow-500">
-                  <QrCode className="h-4 w-4 mr-2" />
+              <h2 className="text-2xl !font-bold">Мої абонементи</h2>
+              <a href="/ski-passes" className="!no-underline">
+                <Button className="!px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
+                  <QrCode className="!h-5 !w-5" />
                   Купити абонемент
                 </Button>
               </a>
@@ -476,16 +476,12 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex  flex-col items-center justify-center">
                         <div className="text-2xl font-bold mb-2">
                           {pass.price}
                         </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <QrCode className="h-4 w-4 mr-1" />
-                            QR-код
-                          </Button>
-                          <Button variant="outline" size="sm">
+                        <div className="">
+                          <Button variant="outline" size="sm" className="!flex !items-center !justify-center !rounded-lg">
                             <Download className="h-4 w-4 mr-1" />
                             Завантажити
                           </Button>
