@@ -1,15 +1,14 @@
-
-//import { SidebarMenu } from './components/SidebarMenu'
-import HomePage from "../src/pages/Homepage"; // ✅ правильний синтаксис
-
+import HomePage from "../src/pages/Homepage"; 
+import CabinetPage from "./pages/CabinetPage";
+import { Routes, Route } from "react-router-dom";
 import './index.css'
 
 function App() {
-
   return (
-    <>
-      <HomePage />
-    </>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/dashboard" element={<CabinetPage />} />
+    </Routes>
   )
 }
 
