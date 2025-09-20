@@ -372,10 +372,10 @@ export default function DashboardPage() {
           {/* Rentals Tab */}
           <TabsContent value="rentals" className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Оренда обладнання</h2>
-              <a href="/rental">
-                <Button className="bg-yellow-400 text-black hover:bg-yellow-500">
-                  <Snowflake className="h-4 w-4 mr-2" />
+              <h2 className="text-2xl !font-bold">Оренда обладнання</h2>
+              <a href="/rental" className="!no-underline">
+                <Button className="!px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
+                  <Snowflake className="!h-5 !w-5" />
                   Орендувати обладнання
                 </Button>
               </a>
@@ -410,13 +410,14 @@ export default function DashboardPage() {
                           {rental.dates}
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col !items-center !justify-center">
                         <div className="text-2xl font-bold mb-2">
                           {rental.price}
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
+                          className="!flex !items-center !justify-center !rounded-lg"
                           onClick={() => setRentalDetailsModal(rental.id)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
