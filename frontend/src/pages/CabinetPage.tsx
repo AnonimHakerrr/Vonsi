@@ -304,22 +304,26 @@ export default function DashboardPage() {
 
           {/* Bookings Tab */}
           <TabsContent value="bookings" className="space-y-6">
-            <div className="flex items-center justify-between">
+            {/* Заголовок + кнопка */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-2xl !font-bold">Мої бронювання</h2>
               <a href="/booking" className="!no-underline">
-                <Button className="!px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold ">
-                  <Calendar className="!h-5 !w-5" />
+                <Button className="w-full sm:w-auto !px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
+                  <Calendar className="!h-5 !w-5 mr-2" />
                   Нове бронювання
                 </Button>
               </a>
             </div>
+
+            {/* Список бронювань */}
             <div className="space-y-4">
               {bookings.map((booking) => (
                 <Card key={booking.id}>
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      {/* Ліва частина */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge variant="outline">{booking.type}</Badge>
                           <Badge
                             className={
@@ -336,7 +340,7 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-semibold mb-1">
                           {booking.name}
                         </h3>
-                        <div className="flex items-center gap-4 text-muted-foreground text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-muted-foreground text-sm">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             {booking.dates}
@@ -348,7 +352,9 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right flex flex-col !items-center !justify-center">
+
+                      {/* Права частина */}
+                      <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
                           {booking.price}
                         </div>
@@ -358,7 +364,7 @@ export default function DashboardPage() {
                           className="!flex !items-center !justify-center !rounded-lg"
                           onClick={() => setBookingDetailsModal(booking.id)}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-4 w-4 mr-1" />
                           Деталі
                         </Button>
                       </div>
@@ -371,22 +377,26 @@ export default function DashboardPage() {
 
           {/* Rentals Tab */}
           <TabsContent value="rentals" className="space-y-6">
-            <div className="flex items-center justify-between">
+            {/* Заголовок + кнопка */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-2xl !font-bold">Оренда обладнання</h2>
-              <a href="/rental" className="!no-underline">
-                <Button className="!px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
-                  <Snowflake className="!h-5 !w-5" />
+              <a href="/rental" className="!no-underline w-full sm:w-auto">
+                <Button className="w-full sm:w-auto !px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
+                  <Snowflake className="!h-5 !w-5 mr-2" />
                   Орендувати обладнання
                 </Button>
               </a>
             </div>
+
+            {/* Список оренд */}
             <div className="space-y-4">
               {rentals.map((rental) => (
                 <Card key={rental.id}>
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      {/* Ліва частина */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge
                             className={
                               rental.status === "active"
@@ -410,7 +420,9 @@ export default function DashboardPage() {
                           {rental.dates}
                         </div>
                       </div>
-                      <div className="text-right flex flex-col !items-center !justify-center">
+
+                      {/* Права частина */}
+                      <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
                           {rental.price}
                         </div>
@@ -433,22 +445,26 @@ export default function DashboardPage() {
 
           {/* Ski Passes Tab */}
           <TabsContent value="ski-passes" className="space-y-6">
-            <div className="flex items-center justify-between">
+            {/* Заголовок + кнопка */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-2xl !font-bold">Мої абонементи</h2>
-              <a href="/ski-passes" className="!no-underline">
-                <Button className="!px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
-                  <QrCode className="!h-5 !w-5" />
+              <a href="/ski-passes" className="!no-underline w-full sm:w-auto">
+                <Button className="w-full sm:w-auto !px-3 !py-3 !bg-yellow-400 !text-black !hover:bg-yellow-500 !flex !items-center !justify-center !rounded-lg !font-semibold">
+                  <QrCode className="!h-5 !w-5 mr-2" />
                   Купити абонемент
                 </Button>
               </a>
             </div>
+
+            {/* Список абонементів */}
             <div className="space-y-4">
               {skiPasses.map((pass) => (
                 <Card key={pass.id}>
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      {/* Ліва частина */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge variant="outline">{pass.type}</Badge>
                           <Badge
                             className={
@@ -465,7 +481,7 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-semibold mb-1">
                           {pass.name}
                         </h3>
-                        <div className="flex items-center gap-4 text-muted-foreground text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-muted-foreground text-sm">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             {pass.validFrom} - {pass.validTo}
@@ -476,16 +492,20 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right flex  flex-col items-center justify-center">
+
+                      {/* Права частина */}
+                      <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
                           {pass.price}
                         </div>
-                        <div className="">
-                          <Button variant="outline" size="sm" className="!flex !items-center !justify-center !rounded-lg">
-                            <Download className="h-4 w-4 mr-1" />
-                            Завантажити
-                          </Button>
-                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="!flex !items-center !justify-center !rounded-lg"
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Завантажити
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
