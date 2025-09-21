@@ -114,7 +114,9 @@ export default function SkiPassesPage() {
                   >
                     <Mountain className="h-10 w-10 text-white" />
                   </div>
-                  <CardTitle className="text-2xl font-bold">{pass.name}</CardTitle>
+                  <CardTitle className="text-2xl font-bold">
+                    {pass.name} <span className="text-yellow-400">абонемент</span>
+                  </CardTitle>
                   <CardDescription className="text-sm">
                     {pass.description}
                   </CardDescription>
@@ -159,37 +161,43 @@ export default function SkiPassesPage() {
 
           {/* Purchase Form */}
           {selectedPass && (
-            <Card className="max-w-2xl mx-auto">
+            <Card className="max-w-2xl mx-auto w-full px-2 sm:px-4">
               <CardHeader>
-                <CardTitle>Оформлення абонемента</CardTitle>
-                <CardDescription>
+                <CardTitle className="font-bold text-lg sm:text-xl md:text-2xl lg:text-xl">
+                  Оформлення абонемента
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base md:text-lg lg:text-base">
                   Вкажіть деталі для придбання:{" "}
                   {skiPassess.find((p) => p.id === selectedPass)?.name}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
+              <CardContent className="space-y-6 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                   {/* Date Picker */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                  <div className="space-y-2 w-full">
+                    <label className="text-sm sm:text-base md:text-base font-medium">
                       Дата початку дії
                     </label>
                     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-start text-left font-normal bg-transparent"
+                          className="w-full !flex rounded-2  justify-start text-left font-normal bg-transparent"
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {startDate
-                            ? format(startDate, "dd MMMM yyyy", { locale: uk })
-                            : "Оберіть дату"}
+                          <CalendarIcon className="!font-medium mr-1 !h-5 !w-5 sm:h-6 sm:w-6" />
+                          <span className="text-sm sm:text-base md:text-base">
+                            {startDate
+                              ? format(startDate, "dd MMMM yyyy", {
+                                  locale: uk,
+                                })
+                              : "Оберіть дату"}
+                          </span>
                         </Button>
                       </PopoverTrigger>
 
                       <PopoverContent className="w-auto p-0">
                         <Calendar
-                          mode="single" // додано
+                          mode="single"
                           selected={startDate}
                           onSelectDate={(date: Date | undefined) => {
                             setStartDate(date);
@@ -201,34 +209,59 @@ export default function SkiPassesPage() {
                   </div>
 
                   {/* Quantity */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                  <div className="space-y-2 w-full">
+                    <label className="text-sm sm:text-base md:text-base font-medium">
                       Кількість абонементів
                     </label>
                     <Select value={quantity} onValueChange={setQuantity}>
-                      <SelectTrigger>
-                        <SelectValue />
+                      <SelectTrigger className="rounded-2 !font-base bg-transparent w-full">
+                        <SelectValue className="text-sm sm:text-base md:text-base" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 абонемент</SelectItem>
-                        <SelectItem value="2">2 абонементи</SelectItem>
-                        <SelectItem value="3">3 абонементи</SelectItem>
-                        <SelectItem value="4">4 абонементи</SelectItem>
-                        <SelectItem value="5">5 абонементів</SelectItem>
+                      <SelectContent className="!rounded-2 bg-white">
+                        <SelectItem
+                          className="text-sm sm:text-base md:text-base"
+                          value="1"
+                        >
+                          1 абонемент
+                        </SelectItem>
+                        <SelectItem
+                          className="text-sm sm:text-base md:text-base"
+                          value="2"
+                        >
+                          2 абонементи
+                        </SelectItem>
+                        <SelectItem
+                          className="text-sm sm:text-base md:text-base"
+                          value="3"
+                        >
+                          3 абонементи
+                        </SelectItem>
+                        <SelectItem
+                          className="text-sm sm:text-base md:text-base"
+                          value="4"
+                        >
+                          4 абонементи
+                        </SelectItem>
+                        <SelectItem
+                          className="text-sm sm:text-base md:text-base"
+                          value="5"
+                        >
+                          5 абонементів
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 {/* Summary */}
-                <div className="bg-muted p-4 rounded-lg space-y-2">
-                  <div className="flex justify-between">
+                <div className="bg-muted p-4 rounded-lg space-y-2 w-full">
+                  <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                     <span>Абонемент:</span>
                     <span>
                       {skiPassess.find((p) => p.id === selectedPass)?.name}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                     <span>Ціна за одиниць:</span>
                     <span>
                       ₴
@@ -237,12 +270,12 @@ export default function SkiPassesPage() {
                         ?.price.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                     <span>Кількість:</span>
                     <span>{quantity}</span>
                   </div>
                   {startDate && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                       <span>Дата початку:</span>
                       <span>
                         {format(startDate, "dd MMMM yyyy", { locale: uk })}
@@ -250,32 +283,34 @@ export default function SkiPassesPage() {
                     </div>
                   )}
                   <div className="border-t pt-2">
-                    <div className="flex justify-between text-lg font-bold">
+                    <div className="flex justify-between text-base sm:text-base md:text-lg lg:text-xl font-bold">
                       <span>Загальна сума:</span>
                       <span>₴{calculateTotal().toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
 
-                <Button
-                  onClick={handlePurchase}
-                  className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
-                  disabled={!startDate}
-                >
-                  Придбати абонемент
-                </Button>
+                {/* Purchase Button */}
+                <div className="flex justify-center w-full">
+                  <Button
+                    onClick={handlePurchase}
+                    className="w-1/2 sm:w-1/2 md:w-1/2 lg:w-1/2 bg-yellow-400 text-black hover:bg-yellow-500 font-bold rounded-2 text-sm sm:!text-base md:text-lg lg:text-xl"
+                    disabled={!startDate}>
+                    Придбати абонемент
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
 
           {/* Info Section */}
-          <div className="mt-12 grid md:grid-cols-3 gap-8">
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card>
               <CardContent className="p-6 text-center">
                 <Mountain className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
+                <h4 className="text-lg !font-bold mb-2">
                   15 трас різної складності
-                </h3>
+                </h4>
                 <p className="text-muted-foreground text-sm">
                   Від зелених трас для початківців до чорних для експертів
                 </p>
@@ -285,7 +320,7 @@ export default function SkiPassesPage() {
             <Card>
               <CardContent className="p-6 text-center">
                 <Clock className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Режим роботи</h3>
+                <h4 className="text-lg !font-bold mb-2">Режим роботи</h4>
                 <p className="text-muted-foreground text-sm">
                   Щодня з 8:00 до 22:00
                   <br />
@@ -297,7 +332,7 @@ export default function SkiPassesPage() {
             <Card>
               <CardContent className="p-6 text-center">
                 <Users className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Групові знижки</h3>
+                <h4 className="text-lg !font-bold mb-2">Групові знижки</h4>
                 <p className="text-muted-foreground text-sm">
                   Знижка 15% при покупці від 5 абонементів
                   <br />

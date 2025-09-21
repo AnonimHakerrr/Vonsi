@@ -117,7 +117,7 @@ export const skiPasses = [
 export const skiPassess = [
   {
     id: "day-pass",
-    name: "Денний абонемент",
+    name: "Денний",
     description: "Один день катання на всіх трасах",
     price: 800,
     duration: "1 день",
@@ -132,7 +132,7 @@ export const skiPassess = [
   },
   {
     id: "weekend-pass",
-    name: "Вікенд абонемент",
+    name: "Вікенд",
     description: "Два дні катання (субота + неділя)",
     price: 1400,
     duration: "2 дні",
@@ -148,7 +148,7 @@ export const skiPassess = [
   },
   {
     id: "week-pass",
-    name: "Тижневий абонемент",
+    name: "Тижневий",
     description: "Сім днів катання протягом тижня",
     price: 4500,
     duration: "7 днів",
@@ -166,7 +166,7 @@ export const skiPassess = [
   },
   {
     id: "season-pass",
-    name: "Сезонний абонемент",
+    name: "Сезонний",
     description: "Весь зимовий сезон (грудень - березень)",
     price: 15000,
     duration: "Весь сезон",
