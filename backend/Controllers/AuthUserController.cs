@@ -6,6 +6,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace backend.Controllers
@@ -58,5 +59,27 @@ namespace backend.Controllers
             return Ok(response);
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] SignInDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userService.GetByEmailAsync(dto.Email);
+            if (user == null)
+                return Unauthorized("Invalid email or password");
+
+            if (!PasswordHasher.Verify(dto.Password, user.PasswordHash))
+                return Unauthorized("Invalid email or password");
+
+            // Генеруємо JWT токен
+            var token = _jwtService.GenerateToken(user);
+
+            // Мапимо у DTO
+            var response = _mapper.Map<UserResponseDto>(user);
+            response.Token = token;
+
+            return Ok(response);
+        }
     }
 }
