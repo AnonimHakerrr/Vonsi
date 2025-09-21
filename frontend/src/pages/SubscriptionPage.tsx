@@ -66,17 +66,22 @@ export default function SkiPassesPage() {
       <div className="md:ml-64">
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Header */}
-          <div className="mb-8 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Snowflake className="h-8 w-8 text-yellow-400" />
-              <Badge className="bg-yellow-400 text-black text-lg px-4 py-2">
-                Зимовий сезон 2024/25
+          <div className="mb-8 text-center px-4 sm:px-6 lg:px-8">
+            {/* Badge і іконка */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
+              <Snowflake className="!h-8 !w-8 !sm:h-8 !sm:w-8 text-yellow-400" />
+              <Badge className="bg-yellow-400 text-black text-base sm:text-lg font-semibold px-3 sm:px-4 py-1 sm:py-2">
+                Зимовий сезон 2025/26
               </Badge>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-balance">
+
+            {/* Заголовок */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-balance leading-snug sm:leading-tight !font-bold">
               Абонементи на <span className="text-yellow-400">катання</span>
             </h1>
-            <p className="text-xl text-muted-foreground text-pretty max-w-2xl mx-auto">
+
+            {/* Опис */}
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-full sm:max-w-xl md:max-w-2xl mx-auto leading-relaxed">
               Оберіть найкращий абонемент для вашого зимового відпочинку на
               лижних трасах VONSI RESORT
             </p>
@@ -89,15 +94,15 @@ export default function SkiPassesPage() {
                 key={pass.id}
                 className={`relative border-2 cursor-pointer transition-all hover:shadow-lg ${
                   selectedPass === pass.id
-                    ? "border-yellow-400 shadow-lg"
+                    ? "!border-yellow-400 shadow-lg"
                     : "border-border hover:border-yellow-200"
                 } ${pass.popular ? "ring-2 ring-yellow-400" : ""}`}
                 onClick={() => setSelectedPass(pass.id)}
               >
                 {pass.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-yellow-400 text-black px-3 py-1">
-                      <Star className="h-3 w-3 mr-1" />
+                    <Badge className="bg-yellow-400 font-semibold text-black px-3 py-1">
+                      <Star className="!h-4 !w-4 mr-1" />
                       Популярний
                     </Badge>
                   </div>
@@ -105,11 +110,11 @@ export default function SkiPassesPage() {
 
                 <CardHeader className="text-center pb-4">
                   <div
-                    className={`w-16 h-16 ${pass.color} rounded-full flex items-center justify-center mx-auto mb-4`}
+                    className={`w-18 h-18 ${pass.color} rounded-full flex items-center justify-center mx-auto mb-4`}
                   >
-                    <Mountain className="h-8 w-8 text-white" />
+                    <Mountain className="h-10 w-10 text-white" />
                   </div>
-                  <CardTitle className="text-xl">{pass.name}</CardTitle>
+                  <CardTitle className="text-2xl font-bold">{pass.name}</CardTitle>
                   <CardDescription className="text-sm">
                     {pass.description}
                   </CardDescription>
@@ -132,17 +137,17 @@ export default function SkiPassesPage() {
                         key={index}
                         className="flex items-start gap-2 text-sm"
                       >
-                        <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <Check className="h-4 w-4 !text-black bg-yellow-500 rounded-full mt-0.5 flex-shrink-0" />
                         <span>{feature}</span>
                       </div>
                     ))}
                   </div>
 
                   <Button
-                    className={`w-full ${
+                    className={`w-full rounded-2 font-bold ${
                       selectedPass === pass.id
                         ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                        : "bg-transparent border-yellow-400 text-yellow-600 hover:bg-yellow-50"
+                        : "bg-transparent font-medium border-yellow-400 text-yellow-600 hover:bg-yellow-50"
                     }`}
                   >
                     {selectedPass === pass.id ? "Обрано" : "Обрати"}
