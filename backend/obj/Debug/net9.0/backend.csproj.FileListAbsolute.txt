@@ -49,3 +49,5 @@
 /Users/macbook/Desktop/project/Vonsi/backend/obj/Debug/net9.0/backend.pdb
 /Users/macbook/Desktop/project/Vonsi/backend/obj/Debug/net9.0/backend.genruntimeconfig.cache
 /Users/macbook/Desktop/project/Vonsi/backend/obj/Debug/net9.0/ref/backend.dll
+/Users/macbook/Desktop/project/Vonsi/backend/bin/Debug/net9.0/AutoMapper.dll
+/Users/macbook/Desktop/project/Vonsi/backend/bin/Debug/net9.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
