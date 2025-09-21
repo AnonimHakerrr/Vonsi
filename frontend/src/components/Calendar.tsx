@@ -1,9 +1,16 @@
 import React, { useState } from "react";
-import { DayPicker, type DayPickerProps } from "react-day-picker";
+import { DayPicker, type PropsSingle,  type Modifiers } from "react-day-picker";
 import { cn } from "../lib/utils";
 import { cva } from "class-variance-authority";
 
-// Стилі кнопок днів
+interface CalendarProps extends PropsSingle {
+  className?: string;
+  showOutsideDays?: boolean;
+  classNames?: Record<string, string>;
+  disabled?: (date: Date) => boolean;
+  onSelectDate?: (date: Date | undefined) => void; // новий проп
+}
+
 const buttonVariants = cva(
   "rounded-lg text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 p-2 text-center",
   {
@@ -11,7 +18,8 @@ const buttonVariants = cva(
       variant: {
         default: "bg-yellow-400 text-black hover:bg-yellow-300",
         ghost: "hover:bg-yellow-100 hover:text-black",
-        outline: "border bg-white text-black hover:bg-yellow-50 hover:text-black",
+        outline:
+          "border bg-white text-black hover:bg-yellow-50 hover:text-black",
       },
     },
     defaultVariants: {
@@ -20,28 +28,43 @@ const buttonVariants = cva(
   }
 );
 
-// Українські скорочення днів тижня
 const ukShortWeekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
 
-export const Calendar: React.FC<DayPickerProps> = ({
+export const Calendar: React.FC<CalendarProps> = ({
   className,
   classNames,
   showOutsideDays = false,
+  selected,
+  onSelect,
+  onSelectDate,
   ...props
 }) => {
   const [month, setMonth] = useState(new Date());
+  const [internalSelected, setInternalSelected] = useState<Date | undefined>();
 
-  // Тепер просто Date
-  const [selected, setSelected] = useState<Date | undefined>(undefined);
+  const isControlled = selected !== undefined && onSelect !== undefined;
+  const currentSelected = isControlled ? selected : internalSelected;
 
-  const handleSelect = (date: Date | undefined) => {
-    setSelected(date);
+  const handleSelect = (
+    selected: Date | undefined,
+    triggerDate: Date,
+    modifiers: Modifiers,
+    e: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    if (isControlled) {
+      // передаємо лише selected в батьківський компонент
+      onSelect?.(selected, triggerDate, modifiers, e);
+    } else {
+      setInternalSelected(selected);
+    }
+    // новий проп для зручності батька
+    onSelectDate?.(selected);
   };
 
   const handlePrev = () =>
-    setMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
+    setMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));
   const handleNext = () =>
-    setMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+    setMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1));
 
   return (
     <div className="p-4 bg-black rounded-lg inline-block relative">
@@ -56,24 +79,20 @@ export const Calendar: React.FC<DayPickerProps> = ({
       <DayPicker
         {...props}
         mode="single"
-        selected={selected} // <-- тут тепер Date | undefined
+        selected={currentSelected}
         onSelect={handleSelect}
-        showOutsideDays={showOutsideDays}
         month={month}
         onMonthChange={setMonth}
         numberOfMonths={1}
         weekStartsOn={1}
+        showOutsideDays={showOutsideDays}
         formatters={{
-          formatWeekdayName: day =>
+          formatWeekdayName: (day) =>
             ukShortWeekdays[day.getDay() === 0 ? 6 : day.getDay() - 1],
         }}
         className={cn("bg-black rounded-lg text-white", className)}
         classNames={{
           months: "px-3 py-2",
-          table: "",
-          head_cell: "",
-          row: "",
-          cell: "",
           day: cn(
             buttonVariants({ variant: "ghost" }),
             "h-9 w-9 text-sm font-normal"
