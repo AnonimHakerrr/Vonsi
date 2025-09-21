@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+
+import { useState } from "react"
 import { format } from "date-fns"
 import { uk } from "date-fns/locale"
 import { skiPassess } from "../Data/mockData"
@@ -17,15 +18,15 @@ export default function SkiPassesPage() {
   const [selectedPass, setSelectedPass] = useState<string>("")
   const [startDate, setStartDate] = useState<Date>()
   const [quantity, setQuantity] = useState("1")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  //const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
 
   const handlePurchase = () => {
-    if (!isLoggedIn) {
+    /*if (!isLoggedIn) {
       setAuthModalOpen(true)
       return
     }
-
+    */
     const pass = skiPassess.find((p) => p.id === selectedPass)
     if (!pass) return
 
