@@ -281,7 +281,7 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
                   <a href="/booking" className="!no-underline">
-                    <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg">
+                    <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg !text-sm !sm:text-base !md:text-lg !lg:text-xl ">
                       <Calendar className="!h-5 !w-5 " />
                       Забронювати номер
                     </Button>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
                   <a href="/rental" className="!no-underline">
                     <Button
                       variant="outline"
-                      className="w-full  text-black !hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg"
+                      className="w-full  text-black !hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg !text-sm !sm:text-base !md:text-lg !lg:text-xl "
                     >
                       <Snowflake className="h-5 w-5 mr-2" />
                       Орендувати обладнання
@@ -298,7 +298,7 @@ export default function DashboardPage() {
                   <a href="/ski-passes" className="!no-underline">
                     <Button
                       variant="outline"
-                      className="w-full  text-black !hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg"
+                      className="w-full  text-black !hover:bg-yellow-500 h-12 !flex !items-center !justify-center !font-semibold !text-lg !rounded-lg !text-sm !sm:text-base !md:text-lg !lg:text-xl "
                     >
                       <QrCode className="h-5 w-5 mr-2" />
                       Купити абонемент
