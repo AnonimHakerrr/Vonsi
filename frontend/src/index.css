@@ -14,3 +14,8 @@
     font-family: 'Montserrat', sans-serif !important; /* примусове застосування */
   }
 }
+.rdp-nav,
+.rdp-month_caption {
+  display: none !important;
+}
+
