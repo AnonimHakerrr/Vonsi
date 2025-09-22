@@ -91,6 +91,7 @@ export const rentals = [
   },
 ]
 
+//Для особистого кобінету
 export const skiPasses = [
   {
     id: "1",
@@ -113,7 +114,7 @@ export const skiPasses = [
     qrCode: "SP2024001235",
   },
 ]
-
+//для абонементів на сторнці з купівлі
 export const skiPassess = [
   {
     id: "day-pass",
