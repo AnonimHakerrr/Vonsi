@@ -183,8 +183,8 @@ export default function RentalPage() {
             </Card>
           )}
 
-          <div className="grid lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-1 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-2 md:col-span-2 xl:col-span-1   space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg font-bold">
@@ -265,17 +265,17 @@ export default function RentalPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Категорії</CardTitle>
+                  <CardTitle className="text-lg font-bold">Категорії</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-2 ">
                     {categories.map((category) => (
                       <Button
                         key={category.id}
                         variant={
                           selectedCategory === category.id ? "default" : "ghost"
                         }
-                        className={`w-full justify-start ${
+                        className={`w-full !flex justify-start rounded-2 ${
                           selectedCategory === category.id
                             ? "bg-yellow-400 text-black hover:bg-yellow-500"
                             : "bg-transparent"
@@ -291,20 +291,28 @@ export default function RentalPage() {
               </Card>
             </div>
 
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-2 md:col-span-2 xl:col-span-3">
               <Tabs
                 value={showCart ? "cart" : "equipment"}
                 onValueChange={(value) => setShowCart(value === "cart")}
               >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="equipment">Обладнання</TabsTrigger>
-                  <TabsTrigger value="cart">
+                <TabsList className="flex flex-wrap justify-around bg-gray-200  rounded-lg px-1 py-0">
+                  <TabsTrigger
+                    value="equipment"
+                    className="w-1/2 rounded-2 data-[state=active]:bg-yellow-400 hover:bg-gray-100"
+                  >
+                    Обладнання
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="cart"
+                    className="w-1/2 rounded-2 data-[state=active]:bg-yellow-400 hover:bg-gray-100"
+                  >
                     Кошик ({getTotalItems()})
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="equipment" className="space-y-6">
-                  <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  <div className="grid sm:grid-cols-1 md:grid-cols-1 xl:grid-cols-3 gap-6">
                     {filteredEquipment.map((item) => (
                       <EquipmentCard
                         key={item.id}
@@ -388,12 +396,12 @@ function EquipmentCard({
 
           {item.sizes && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Розмір</Label>
+              <Label className="text-sm font-semibold">Розмір</Label>
               <Select value={selectedSize} onValueChange={setSelectedSize}>
-                <SelectTrigger>
+                <SelectTrigger className="rounded-2">
                   <SelectValue placeholder="Оберіть розмір" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {item.sizes.map((size) => (
                     <SelectItem key={size} value={size}>
                       {size}
@@ -417,9 +425,9 @@ function EquipmentCard({
             <Button
               onClick={() => onAddToCart(item, selectedSize)}
               disabled={item.sizes && !selectedSize}
-              className="bg-yellow-400 text-black hover:bg-yellow-500"
+              className="bg-yellow-400 text-black hover:bg-yellow-500 rounded-2 !flex !w-1/2"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
               Додати
             </Button>
           </div>
@@ -466,81 +474,63 @@ function CartView({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        {cart.map((item) => (
-          <Card key={`${item.id}-${item.selectedSize}`}>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <img
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.name}
-                  className="w-20 h-20 object-cover rounded-lg"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold">{item.name}</h3>
-                  <p className="text-sm text-muted-foreground">{item.brand}</p>
-                  {item.selectedSize && (
-                    <p className="text-sm">Розмір: {item.selectedSize}</p>
-                  )}
-                  <p className="text-sm text-muted-foreground">
-                    ₴{item.price} × {item.rentalDays} дн. × {item.quantity} шт.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      onUpdateQuantity(
-                        item.id,
-                        item.selectedSize,
-                        item.quantity - 1
-                      )
-                    }
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-8 text-center">{item.quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      onUpdateQuantity(
-                        item.id,
-                        item.selectedSize,
-                        item.quantity + 1
-                      )
-                    }
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold">
-                    ₴
-                    {(
-                      item.price *
-                      item.quantity *
-                      item.rentalDays
-                    ).toLocaleString()}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveItem(item.id, item.selectedSize)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    Видалити
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+    <div className="grid sm:grid-cols-1 md:grid-cols-1 xl:grid-cols-3 gap-6">
+      {cart.map((item) => (
+        <Card key={`${item.id}-${item.selectedSize}`} className="w-full">
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              <img
+                src={item.image || "/placeholder.svg"}
+                alt={item.name}
+                className="w-full h-48 object-cover rounded-lg"
+              />
 
-      <Card className="border-2 border-yellow-400">
+              <div className="flex flex-col gap-1">
+                <h3 className="!font-bold text-base sm:text-lg md:text-xl m-0">{item.name}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground m-0">{item.brand}</p>
+                {item.selectedSize && <p className="text-xs sm:text-sm m-0">Розмір: {item.selectedSize}</p>}
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  ₴{item.price} × {item.rentalDays} дн. × {item.quantity} шт.
+                </p>
+              </div>
+
+              <div className="flex justify-center items-center gap-2 mt-2 sm:mt-0">
+                <Button
+                  size="sm"
+                  className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
+                  onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity - 1)}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                <Button
+                  size="sm"
+                  className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
+                  onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity + 1)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="flex justify-between items-center mt-5">
+                <div className="font-bold text-xl sm:text-2xl md:text-3xl">
+                  ₴{(item.price * item.quantity * item.rentalDays).toLocaleString()}
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => onRemoveItem(item.id, item.selectedSize)}
+                  className=" !text-xs !w-1/2 text-black bg-yellow-400 hover:bg-yellow-500 hover:text-black font-semibold rounded-2"
+                >
+                  Видалити
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {/* Підсумок */}
+      <Card className="border-2 border-yellow-400 xl:col-span-3">
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex justify-between text-lg font-bold">
