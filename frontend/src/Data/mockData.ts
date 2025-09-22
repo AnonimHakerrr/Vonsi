@@ -1,6 +1,10 @@
 import nomerS from "../assets/nomerS.png"
 import nomerD from "../assets/nomerD.png"
-
+import ski from "../assets/lugi.png"
+import snowboard from "../assets/sbowboard.png"
+import cap from "../assets/cap.png"
+import shoes from "../assets/shoes.png"
+import oko from "../assets/oko.png"
 
 export const userData = {
   name: "Олександр Петренко",
@@ -245,7 +249,7 @@ export const equipment: Equipment[] = [
     brand: "Rossignol",
     category: "skis",
     price: 200,
-    image: "/placeholder.svg?height=200&width=300&text=Rossignol+Skis",
+    image: ski,
     rating: 4.8,
     description: "Універсальні лижі для всіх типів снігу",
     sizes: ["160cm", "170cm", "180cm"],
@@ -257,7 +261,7 @@ export const equipment: Equipment[] = [
     brand: "Burton",
     category: "snowboards",
     price: 180,
-    image: "/placeholder.svg?height=200&width=300&text=Burton+Snowboard",
+    image: snowboard,
     rating: 4.9,
     description: "Ідеальний сноуборд для фрістайлу",
     sizes: ["150cm", "155cm", "160cm"],
@@ -269,7 +273,7 @@ export const equipment: Equipment[] = [
     brand: "K2",
     category: "boots",
     price: 120,
-    image: "/placeholder.svg?height=200&width=300&text=K2+Boots",
+    image: shoes,
     rating: 4.7,
     description: "Комфортні черевики з швидкою шнурівкою",
     sizes: ["38", "39", "40", "41", "42", "43", "44", "45"],
@@ -281,7 +285,7 @@ export const equipment: Equipment[] = [
     brand: "Smith",
     category: "helmets",
     price: 80,
-    image: "/placeholder.svg?height=200&width=300&text=Smith+Helmet",
+    image: cap,
     rating: 4.6,
     description: "Захисний шолом з технологією MIPS",
     sizes: ["S", "M", "L", "XL"],
@@ -293,7 +297,7 @@ export const equipment: Equipment[] = [
     brand: "Smith",
     category: "accessories",
     price: 60,
-    image: "/placeholder.svg?height=200&width=300&text=Smith+Goggles",
+    image: oko,
     rating: 4.5,
     description: "Окуляри з магнітною заміною лінз",
     inStock: 18,

@@ -1,35 +1,56 @@
 // src/pages/RentalPage.tsx
-import { useState } from "react"
-import { format } from "date-fns"
-import { uk } from "date-fns/locale"
-import { CalendarIcon, Plus, Minus, Star, Snowflake, Info, ShoppingCart, LogIn } from "lucide-react"
-import { equipment, type Equipment } from "../Data/mockData"
-import { Button } from "../components/Button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/Card"
-import { Label } from "../components/Label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/Select"
-import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover"
-import { Calendar } from "../components/Calendar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/Tabs"
-import { SidebarMenu } from "../components/SidebarMenu"
-import { RentalConfirmationModal } from "../components/RentalConfirmationModal"
-import { AuthModal } from "../components/AuthModal"
+import { useState } from "react";
+import { format } from "date-fns";
+import { uk } from "date-fns/locale";
+import {
+  CalendarIcon,
+  Plus,
+  Minus,
+  Star,
+  Snowflake,
+  Info,
+  ShoppingCart,
+  LogIn,
+} from "lucide-react";
+import { equipment, type Equipment } from "../Data/mockData";
+import { Button } from "../components/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../components/Card";
+import { Label } from "../components/Label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/Select";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
+import { Calendar } from "../components/Calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/Tabs";
+import { SidebarMenu } from "../components/SidebarMenu";
+import { RentalConfirmationModal } from "../components/RentalConfirmationModal";
+import { AuthModal } from "../components/AuthModal";
 
 interface CartItem extends Equipment {
-  quantity: number
-  selectedSize?: string
-  rentalDays: number
+  quantity: number;
+  selectedSize?: string;
+  rentalDays: number;
 }
 
 export default function RentalPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [startDate, setStartDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
-  const [showCart, setShowCart] = useState(false)
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [isLoggedIn] = useState(true)
-  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const [showCart, setShowCart] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [isLoggedIn] = useState(true);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const categories = [
     { id: "all", name: "Все обладнання", icon: Snowflake },
@@ -38,67 +59,85 @@ export default function RentalPage() {
     { id: "boots", name: "Черевики", icon: Snowflake },
     { id: "helmets", name: "Шоломи", icon: Snowflake },
     { id: "accessories", name: "Аксесуари", icon: Snowflake },
-  ]
+  ];
 
   const filteredEquipment =
-    selectedCategory === "all" ? equipment : equipment.filter((item) => item.category === selectedCategory)
+    selectedCategory === "all"
+      ? equipment
+      : equipment.filter((item) => item.category === selectedCategory);
 
   const calculateRentalDays = () => {
     if (startDate && endDate) {
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-      return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
-    return 1
-  }
+    return 1;
+  };
 
   const addToCart = (item: Equipment, size?: string) => {
-    const rentalDays = calculateRentalDays()
-    const existingItem = cart.find((cartItem) => cartItem.id === item.id && cartItem.selectedSize === size)
+    const rentalDays = calculateRentalDays();
+    const existingItem = cart.find(
+      (cartItem) => cartItem.id === item.id && cartItem.selectedSize === size
+    );
 
     if (existingItem) {
       setCart(
         cart.map((cartItem) =>
           cartItem.id === item.id && cartItem.selectedSize === size
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem,
-        ),
-      )
+            : cartItem
+        )
+      );
     } else {
-      setCart([...cart, { ...item, quantity: 1, selectedSize: size, rentalDays }])
+      setCart([
+        ...cart,
+        { ...item, quantity: 1, selectedSize: size, rentalDays },
+      ]);
     }
-  }
+  };
 
   const removeFromCart = (itemId: string, size?: string) => {
-    setCart(cart.filter((item) => !(item.id === itemId && item.selectedSize === size)))
-  }
+    setCart(
+      cart.filter((item) => !(item.id === itemId && item.selectedSize === size))
+    );
+  };
 
-  const updateQuantity = (itemId: string, size: string | undefined, newQuantity: number) => {
+  const updateQuantity = (
+    itemId: string,
+    size: string | undefined,
+    newQuantity: number
+  ) => {
     if (newQuantity === 0) {
-      removeFromCart(itemId, size)
+      removeFromCart(itemId, size);
     } else {
       setCart(
         cart.map((item) =>
-          item.id === itemId && item.selectedSize === size ? { ...item, quantity: newQuantity } : item,
-        ),
-      )
+          item.id === itemId && item.selectedSize === size
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
     }
-  }
+  };
 
   const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity * item.rentalDays, 0)
-  }
+    return cart.reduce(
+      (total, item) => total + item.price * item.quantity * item.rentalDays,
+      0
+    );
+  };
 
   const getTotalItems = () => {
-    return cart.reduce((total, item) => total + item.quantity, 0)
-  }
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
 
   const handleRentalConfirmation = () => {
     if (!isLoggedIn) {
-      setAuthModalOpen(true)
-      return
+      setAuthModalOpen(true);
+      return;
     }
-    setConfirmationModalOpen(true)
-  }
+    setConfirmationModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -107,7 +146,9 @@ export default function RentalPage() {
       <div className="md:ml-64">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4 text-balance">Оренда обладнання</h1>
+            <h1 className="text-4xl !font-bold mb-4 text-balance">
+              Оренда <span className="text-yellow-400">обладнання</span>
+            </h1>
             <p className="text-xl text-muted-foreground text-pretty">
               Орендуйте найкраще лижне обладнання від провідних брендів
             </p>
@@ -115,18 +156,25 @@ export default function RentalPage() {
 
           {!isLoggedIn && cart.length > 0 && (
             <Card className="mb-6 border-yellow-400 bg-yellow-50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <LogIn className="h-5 w-5 text-yellow-600" />
+              <CardContent className="p-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  {/* Лівий блок з іконкою і текстом */}
+                  <div className="flex items-start sm:items-center gap-2">
+                    <LogIn className="h-5 w-5 text-yellow-600 flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-yellow-800">Увійдіть для оформлення оренди</p>
-                      <p className="text-sm text-yellow-700">Для продовження потрібна авторизація</p>
+                      <p className="font-medium text-yellow-800 m-0 text-sm sm:text-base">
+                        Увійдіть для оформлення оренди
+                      </p>
+                      <p className="text-xs sm:text-sm text-yellow-700 m-0">
+                        Для продовження потрібна авторизація
+                      </p>
                     </div>
                   </div>
+
+                  {/* Кнопка */}
                   <Button
                     onClick={() => setAuthModalOpen(true)}
-                    className="bg-yellow-400 text-black hover:bg-yellow-500"
+                    className="w-full sm:w-auto bg-yellow-400 text-black hover:bg-yellow-500 !rounded-md font-semibold text-xs sm:text-sm px-3 py-2"
                   >
                     Увійти
                   </Button>
@@ -139,8 +187,10 @@ export default function RentalPage() {
             <div className="lg:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Період оренди</CardTitle>
-                  <CardDescription>Оберіть дати для розрахунку вартості</CardDescription>
+                  <CardTitle className="text-lg font-bold">Період оренди</CardTitle>
+                  <CardDescription>
+                    Оберіть дати для розрахунку вартості
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -152,7 +202,9 @@ export default function RentalPage() {
                           className="w-full justify-start text-left font-normal bg-transparent"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {startDate ? format(startDate, "dd MMM yyyy", { locale: uk }) : "Оберіть дату"}
+                          {startDate
+                            ? format(startDate, "dd MMM yyyy", { locale: uk })
+                            : "Оберіть дату"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -175,7 +227,9 @@ export default function RentalPage() {
                           className="w-full justify-start text-left font-normal bg-transparent"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {endDate ? format(endDate, "dd MMM yyyy", { locale: uk }) : "Оберіть дату"}
+                          {endDate
+                            ? format(endDate, "dd MMM yyyy", { locale: uk })
+                            : "Оберіть дату"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -191,7 +245,9 @@ export default function RentalPage() {
 
                   {startDate && endDate && (
                     <div className="bg-yellow-50 p-3 rounded-lg">
-                      <p className="text-sm font-medium">Кількість днів: {calculateRentalDays()}</p>
+                      <p className="text-sm font-medium">
+                        Кількість днів: {calculateRentalDays()}
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -206,7 +262,9 @@ export default function RentalPage() {
                     {categories.map((category) => (
                       <Button
                         key={category.id}
-                        variant={selectedCategory === category.id ? "default" : "ghost"}
+                        variant={
+                          selectedCategory === category.id ? "default" : "ghost"
+                        }
                         className={`w-full justify-start ${
                           selectedCategory === category.id
                             ? "bg-yellow-400 text-black hover:bg-yellow-500"
@@ -224,16 +282,26 @@ export default function RentalPage() {
             </div>
 
             <div className="lg:col-span-3">
-              <Tabs value={showCart ? "cart" : "equipment"} onValueChange={(value) => setShowCart(value === "cart")}>
+              <Tabs
+                value={showCart ? "cart" : "equipment"}
+                onValueChange={(value) => setShowCart(value === "cart")}
+              >
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="equipment">Обладнання</TabsTrigger>
-                  <TabsTrigger value="cart">Кошик ({getTotalItems()})</TabsTrigger>
+                  <TabsTrigger value="cart">
+                    Кошик ({getTotalItems()})
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="equipment" className="space-y-6">
                   <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredEquipment.map((item) => (
-                      <EquipmentCard key={item.id} item={item} onAddToCart={addToCart} rentalDays={calculateRentalDays()} />
+                      <EquipmentCard
+                        key={item.id}
+                        item={item}
+                        onAddToCart={addToCart}
+                        rentalDays={calculateRentalDays()}
+                      />
                     ))}
                   </div>
                 </TabsContent>
@@ -268,7 +336,7 @@ export default function RentalPage() {
         endDate={endDate}
       />
     </div>
-  )
+  );
 }
 
 function EquipmentCard({
@@ -276,28 +344,36 @@ function EquipmentCard({
   onAddToCart,
   rentalDays,
 }: {
-  item: Equipment
-  onAddToCart: (item: Equipment, size?: string) => void
-  rentalDays: number
+  item: Equipment;
+  onAddToCart: (item: Equipment, size?: string) => void;
+  rentalDays: number;
 }) {
-  const [selectedSize, setSelectedSize] = useState<string>("")
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   return (
     <Card className="border-2 hover:border-yellow-400 transition-colors">
       <CardContent className="p-6">
         <div className="space-y-4">
-          <img src={item.image || "/placeholder.svg"} alt={item.name} className="w-full h-48 object-cover rounded-lg" />
+          <img
+            src={item.image || "/placeholder.svg"}
+            alt={item.name}
+            className="w-full h-48 object-cover rounded-lg"
+          />
 
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="text-xs border rounded px-1">{item.brand}</div>
               <div className="flex items-center gap-1">
                 <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                <span className="text-xs text-muted-foreground">{item.rating}</span>
+                <span className="text-xs text-muted-foreground">
+                  {item.rating}
+                </span>
               </div>
             </div>
             <h3 className="font-bold text-lg mb-2">{item.name}</h3>
-            <p className="text-sm text-muted-foreground mb-4">{item.description}</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              {item.description}
+            </p>
           </div>
 
           {item.sizes && (
@@ -345,7 +421,7 @@ function EquipmentCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function CartView({
@@ -356,12 +432,16 @@ function CartView({
   onConfirmRental,
   isLoggedIn,
 }: {
-  cart: CartItem[]
-  onUpdateQuantity: (itemId: string, size: string | undefined, quantity: number) => void
-  onRemoveItem: (itemId: string, size?: string) => void
-  totalPrice: number
-  onConfirmRental: () => void
-  isLoggedIn: boolean
+  cart: CartItem[];
+  onUpdateQuantity: (
+    itemId: string,
+    size: string | undefined,
+    quantity: number
+  ) => void;
+  onRemoveItem: (itemId: string, size?: string) => void;
+  totalPrice: number;
+  onConfirmRental: () => void;
+  isLoggedIn: boolean;
 }) {
   if (cart.length === 0) {
     return (
@@ -372,7 +452,7 @@ function CartView({
           <p className="text-muted-foreground">Додайте обладнання для оренди</p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -382,27 +462,65 @@ function CartView({
           <Card key={`${item.id}-${item.selectedSize}`}>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <img src={item.image || "/placeholder.svg"} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                <img
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.name}
+                  className="w-20 h-20 object-cover rounded-lg"
+                />
                 <div className="flex-1">
                   <h3 className="font-semibold">{item.name}</h3>
                   <p className="text-sm text-muted-foreground">{item.brand}</p>
-                  {item.selectedSize && <p className="text-sm">Розмір: {item.selectedSize}</p>}
+                  {item.selectedSize && (
+                    <p className="text-sm">Розмір: {item.selectedSize}</p>
+                  )}
                   <p className="text-sm text-muted-foreground">
                     ₴{item.price} × {item.rentalDays} дн. × {item.quantity} шт.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity - 1)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      onUpdateQuantity(
+                        item.id,
+                        item.selectedSize,
+                        item.quantity - 1
+                      )
+                    }
+                  >
                     <Minus className="h-4 w-4" />
                   </Button>
                   <span className="w-8 text-center">{item.quantity}</span>
-                  <Button variant="outline" size="sm" onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity + 1)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      onUpdateQuantity(
+                        item.id,
+                        item.selectedSize,
+                        item.quantity + 1
+                      )
+                    }
+                  >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold">₴{(item.price * item.quantity * item.rentalDays).toLocaleString()}</div>
-                  <Button variant="ghost" size="sm" onClick={() => onRemoveItem(item.id, item.selectedSize)} className="text-red-600 hover:text-red-700">
+                  <div className="font-bold">
+                    ₴
+                    {(
+                      item.price *
+                      item.quantity *
+                      item.rentalDays
+                    ).toLocaleString()}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onRemoveItem(item.id, item.selectedSize)}
+                    className="text-red-600 hover:text-red-700"
+                  >
                     Видалити
                   </Button>
                 </div>
@@ -421,7 +539,9 @@ function CartView({
             </div>
             <Button
               className={`w-full text-lg py-6 ${
-                isLoggedIn ? "bg-yellow-400 text-black hover:bg-yellow-500" : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                isLoggedIn
+                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
               }`}
               onClick={onConfirmRental}
             >
@@ -434,5 +554,5 @@ function CartView({
         </CardContent>
       </Card>
     </div>
-    )
-    }
+  );
+}
