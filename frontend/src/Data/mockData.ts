@@ -186,3 +186,36 @@ export const skiPassess = [
     color: "bg-purple-500",
   },
 ]
+
+export const roomTypes = [
+  {
+    id: "standard",
+    name: "Стандартний номер",
+    description: "Затишний номер з усіма зручностями",
+    price: 2500,
+    maxGuests: 2,
+    amenities: ["Wifi", "Телевізор", "Міні-бар", "Кондиціонер"],
+    image: "/placeholder.svg?height=200&width=300&text=Standard+Room",
+    available: true,
+  },
+  {
+    id: "deluxe",
+    name: "Делюкс номер",
+    description: "Просторий номер з балконом та видом на гори",
+    price: 3500,
+    maxGuests: 3,
+    amenities: ["Wifi", "Балкон", "Міні-бар", "Сейф", "Халати"],
+    image: "/placeholder.svg?height=200&width=300&text=Deluxe+Room",
+    available: true,
+  },
+  {
+    id: "suite",
+    name: "Люкс з видом на гори",
+    description: "Розкішний номер з панорамним видом та джакузі",
+    price: 6000,
+    maxGuests: 4,
+    amenities: ["Wifi", "Джакузі", "Камін", "Кухня", "Тераса"],
+    image: "/placeholder.svg?height=200&width=300&text=Mountain+Suite",
+    available: false, // some rooms may not be available
+  },
+]
