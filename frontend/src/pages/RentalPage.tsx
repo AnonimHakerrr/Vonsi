@@ -187,21 +187,23 @@ export default function RentalPage() {
             <div className="lg:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg font-bold">Період оренди</CardTitle>
+                  <CardTitle className="text-lg font-bold">
+                    Період оренди
+                  </CardTitle>
                   <CardDescription>
-                    Оберіть дати для розрахунку вартості
+                    Оберіть дати оренди для розрахунку вартості
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Дата початку</Label>
+                    <Label className="font-semibold">Дата початку</Label>
                     <Popover>
-                      <PopoverTrigger asChild>
+                      <PopoverTrigger asChild className="rounded-2">
                         <Button
                           variant="outline"
-                          className="w-full justify-start text-left font-normal bg-transparent"
+                          className="w-full text-left font-normal bg-transparent !flex "
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="h-4 w-4" />
                           {startDate
                             ? format(startDate, "dd MMM yyyy", { locale: uk })
                             : "Оберіть дату"}
@@ -211,20 +213,24 @@ export default function RentalPage() {
                         <Calendar
                           mode="single"
                           selected={startDate}
-                          onSelect={setStartDate}
-                          disabled={(date) => date < new Date()}
+                          onSelectDate={setStartDate} // твій новий проп
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // обнуляємо час
+                            return date < today;
+                          }}
                         />
                       </PopoverContent>
                     </Popover>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Дата закінчення</Label>
+                    <Label className="font-semibold">Дата закінчення</Label>
                     <Popover>
-                      <PopoverTrigger asChild>
+                      <PopoverTrigger asChild className="rounded-2">
                         <Button
                           variant="outline"
-                          className="w-full justify-start text-left font-normal bg-transparent"
+                          className="w-full text-left font-normal bg-transparent !flex "
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {endDate
@@ -235,16 +241,20 @@ export default function RentalPage() {
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={endDate}
-                          onSelect={setEndDate}
-                          disabled={(date) => date <= (startDate || new Date())}
+                          selected={startDate}
+                          onSelectDate={setEndDate} // твій новий проп
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // обнуляємо час
+                            return date < today;
+                          }}
                         />
                       </PopoverContent>
                     </Popover>
                   </div>
 
                   {startDate && endDate && (
-                    <div className="bg-yellow-50 p-3 rounded-lg">
+                    <div className="bg-yellow-50 p-3 rounded-lg flex items-center">
                       <p className="text-sm font-medium">
                         Кількість днів: {calculateRentalDays()}
                       </p>

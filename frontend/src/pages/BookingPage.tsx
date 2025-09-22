@@ -239,6 +239,11 @@ export default function BookingPage() {
                             onSelectDate={(date: Date | undefined) =>
                               setCheckIn(date)
                             }
+                            disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // обнуляємо час
+                            return date < today;
+                          }}
                           />
                         </PopoverContent>
                       </Popover>
@@ -268,6 +273,11 @@ export default function BookingPage() {
                             onSelectDate={(date: Date | undefined) =>
                               setCheckOut(date)
                             }
+                            disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // обнуляємо час
+                            return date < today;
+                          }}
                           />
                         </PopoverContent>
                       </Popover>

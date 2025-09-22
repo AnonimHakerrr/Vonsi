@@ -203,6 +203,11 @@ export default function SkiPassesPage() {
                             setStartDate(date);
                             setPopoverOpen(false);
                           }}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // обнуляємо час
+                            return date < today;
+                          }}
                         />
                       </PopoverContent>
                     </Popover>
