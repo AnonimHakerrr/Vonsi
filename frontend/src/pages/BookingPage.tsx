@@ -519,35 +519,39 @@ export default function BookingPage() {
 
           {/* === КРОК 3 === */}
           {step === 3 && (
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Підтвердження бронювання</CardTitle>
+                    <CardTitle className="font-bold text-xl">
+                      Підтвердження бронювання
+                    </CardTitle>
                     <CardDescription>
                       Перевірте деталі вашого бронювання
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <h3 className="font-semibold mb-2">Обраний номер</h3>
-                      <div className="bg-muted p-4 rounded-lg">
-                        {roomTypes.find((r) => r.id === selectedRoom)?.name}
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-center gap-3">
+                      <h4 className="">Обраний номер: </h4>
+                      <div className="bg-muted rounded-lg">
+                        <h5 className="!text-lg !font-bold">
+                          {roomTypes.find((r) => r.id === selectedRoom)?.name}
+                        </h5>
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-center justify-center gap-20">
                       <div>
-                        <h3 className="font-semibold mb-2">Дата заїзду</h3>
-                        <div className="bg-muted p-4 rounded-lg">
+                        <h4 className="">Дата заїзду</h4>
+                        <div className="bg-muted rounded-lg font-bold">
                           {checkIn
                             ? format(checkIn, "dd MMMM yyyy", { locale: uk })
                             : "Не обрано"}
                         </div>
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-2">Дата виїзду</h3>
-                        <div className="bg-muted p-4 rounded-lg">
+                        <h4 className="font-semibold">Дата виїзду</h4>
+                        <div className="bg-muted rounded-lg font-bold">
                           {checkOut
                             ? format(checkOut, "dd MMMM yyyy", { locale: uk })
                             : "Не обрано"}
@@ -555,48 +559,50 @@ export default function BookingPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="font-semibold mb-2">Гості</h3>
-                      <div className="bg-muted p-4 rounded-lg">
-                        {guests} гостей
+                    <div className="flex items-center gap-15 justify-center">
+                      <h4 className="">Гості: </h4>
+                      <div className="bg-muted rounded-lg font-bold">
+                        <h5 className="!font-bold">{guests} гостей</h5>
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="font-semibold mb-2">Контактні дані</h3>
-                      <div className="bg-muted p-4 rounded-lg space-y-2">
-                        <div>
+                    <div className="flex justify-center  gap-8">
+                      <h4 className="font-semibold text-right">
+                        Контактні дані:
+                      </h4>
+                      <div className="bg-muted rounded-lg flex flex-col w-1/3  justify-around font-bold">
+                        <div className="break-all">
                           {bookingData.firstName} {bookingData.lastName}
                         </div>
-                        <div>{bookingData.email}</div>
-                        <div>{bookingData.phone}</div>
+                        <div className="break-all">{bookingData.email}</div>
+                        <div className="break-all">{bookingData.phone}</div>
                         {bookingData.specialRequests && (
-                          <div className="pt-2 border-t">
+                          <div className="pt-2 border-t break-all text-sm">
                             {bookingData.specialRequests}
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-semibold mb-2">Всього до сплати</h3>
-                        <div className="text-2xl font-bold text-yellow-600">
-                          ₴{calculateTotal().toLocaleString()}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {calculateNights()} ночей × ₴
-                          {roomTypes
-                            .find((r) => r.id === selectedRoom)
-                            ?.price.toLocaleString()}
+                    <div className=" justify-between items-center">
+                      <div className="">
+                        <div className="flex items-center justify-around pb-10">
+                          <h4 className="font-semibold mb-2">
+                            Всього до сплати:{" "}
+                          </h4>
+                          <div className="!text-3xl font-bold text-yellow-600">
+                            ₴{calculateTotal().toLocaleString()}
+                          </div>
                         </div>
                       </div>
-                      <Button
+                      <div className="flex justify-center">
+                        <Button
                         onClick={handleBooking}
-                        className="bg-yellow-400 text-black hover:bg-yellow-500 px-8 py-6 text-lg"
+                        className="!flex items-center !w-1/2 justify-center bg-yellow-400 text-black hover:bg-yellow-500 px-8 py-3 text-lg rounded-2 font-bold"
                       >
-                        Підтвердити бронювання
+                        Готово
                       </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -607,22 +613,22 @@ export default function BookingPage() {
                   <CardHeader>
                     <CardTitle>Важлива інформація</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-2">
                     <div className="flex items-start gap-2">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                      <AlertCircle className="!h-6 !w-10 text-yellow-600 " />
                       <p className="text-sm text-muted-foreground">
                         Безкоштовне скасування бронювання можливе не пізніше ніж
                         за 7 днів до заїзду
                       </p>
                     </div>
                     <div className="flex items-start gap-2">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                      <AlertCircle className="!h-6 !w-5 text-yellow-600 mt-0.5" />
                       <p className="text-sm text-muted-foreground">
                         Заїзд можливий після 14:00, виїзд до 12:00
                       </p>
                     </div>
                     <div className="flex items-start gap-2">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                      <AlertCircle className="!h-6 !w-7 text-yellow-600 mt-0.5" />
                       <p className="text-sm text-muted-foreground">
                         При заселенні необхідно пред'явити паспорт або ID-картку
                       </p>
