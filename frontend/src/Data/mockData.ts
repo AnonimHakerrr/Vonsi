@@ -223,3 +223,79 @@ export const roomTypes = [
     available: false, // some rooms may not be available
   },
 ]
+
+//спорядження
+export interface Equipment {
+  id: string
+  name: string
+  brand: string
+  category: "skis" | "snowboards" | "boots" | "helmets" | "accessories"
+  price: number
+  image: string
+  rating: number
+  description: string
+  sizes?: string[]
+  inStock: number
+}
+
+export const equipment: Equipment[] = [
+  {
+    id: "ski-1",
+    name: "Experience 88 Ti",
+    brand: "Rossignol",
+    category: "skis",
+    price: 200,
+    image: "/placeholder.svg?height=200&width=300&text=Rossignol+Skis",
+    rating: 4.8,
+    description: "Універсальні лижі для всіх типів снігу",
+    sizes: ["160cm", "170cm", "180cm"],
+    inStock: 15,
+  },
+  {
+    id: "snowboard-1",
+    name: "Custom Flying V",
+    brand: "Burton",
+    category: "snowboards",
+    price: 180,
+    image: "/placeholder.svg?height=200&width=300&text=Burton+Snowboard",
+    rating: 4.9,
+    description: "Ідеальний сноуборд для фрістайлу",
+    sizes: ["150cm", "155cm", "160cm"],
+    inStock: 12,
+  },
+  {
+    id: "boots-1",
+    name: "Speed Zone Plus",
+    brand: "K2",
+    category: "boots",
+    price: 120,
+    image: "/placeholder.svg?height=200&width=300&text=K2+Boots",
+    rating: 4.7,
+    description: "Комфортні черевики з швидкою шнурівкою",
+    sizes: ["38", "39", "40", "41", "42", "43", "44", "45"],
+    inStock: 20,
+  },
+  {
+    id: "helmet-1",
+    name: "Vector MIPS",
+    brand: "Smith",
+    category: "helmets",
+    price: 80,
+    image: "/placeholder.svg?height=200&width=300&text=Smith+Helmet",
+    rating: 4.6,
+    description: "Захисний шолом з технологією MIPS",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: 25,
+  },
+  {
+    id: "goggles-1",
+    name: "I/O MAG XL",
+    brand: "Smith",
+    category: "accessories",
+    price: 60,
+    image: "/placeholder.svg?height=200&width=300&text=Smith+Goggles",
+    rating: 4.5,
+    description: "Окуляри з магнітною заміною лінз",
+    inStock: 18,
+  },
+]
