@@ -423,12 +423,12 @@ export default function BookingPage() {
           {step === 2 && (
             <Card>
               <CardHeader>
-                <CardTitle>Деталі бронювання</CardTitle>
+                <CardTitle className="font-bold">Деталі бронювання</CardTitle>
                 <CardDescription>
                   Заповніть контактну інформацію
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 w-full">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">Ім'я</Label>
@@ -498,19 +498,19 @@ export default function BookingPage() {
                   />
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex justify-between">
+                  <Button
+                    onClick={() => setStep(3)}
+                    className="bg-yellow-400 text-black hover:bg-yellow-500 !w-1/4 rounded-2 font-semibold"
+                  >
+                    Далі
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => setStep(1)}
-                    className="bg-transparent"
+                    className="bg-transparent !w-1/4 rounded-2 font-semibold"
                   >
                     Назад
-                  </Button>
-                  <Button
-                    onClick={() => setStep(3)}
-                    className="bg-yellow-400 text-black hover:bg-yellow-500"
-                  >
-                    Переглянути бронювання
                   </Button>
                 </div>
               </CardContent>
