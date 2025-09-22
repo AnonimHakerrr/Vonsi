@@ -486,9 +486,17 @@ function CartView({
               />
 
               <div className="flex flex-col gap-1">
-                <h3 className="!font-bold text-base sm:text-lg md:text-xl m-0">{item.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground m-0">{item.brand}</p>
-                {item.selectedSize && <p className="text-xs sm:text-sm m-0">Розмір: {item.selectedSize}</p>}
+                <h3 className="!font-bold text-base sm:text-lg md:text-xl m-0">
+                  {item.name}
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground m-0">
+                  {item.brand}
+                </p>
+                {item.selectedSize && (
+                  <p className="text-xs sm:text-sm m-0">
+                    Розмір: {item.selectedSize}
+                  </p>
+                )}
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   ₴{item.price} × {item.rentalDays} дн. × {item.quantity} шт.
                 </p>
@@ -498,15 +506,29 @@ function CartView({
                 <Button
                   size="sm"
                   className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
-                  onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity - 1)}
+                  onClick={() =>
+                    onUpdateQuantity(
+                      item.id,
+                      item.selectedSize,
+                      item.quantity - 1
+                    )
+                  }
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                <span className="w-8 text-center font-semibold">
+                  {item.quantity}
+                </span>
                 <Button
                   size="sm"
                   className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
-                  onClick={() => onUpdateQuantity(item.id, item.selectedSize, item.quantity + 1)}
+                  onClick={() =>
+                    onUpdateQuantity(
+                      item.id,
+                      item.selectedSize,
+                      item.quantity + 1
+                    )
+                  }
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -514,7 +536,12 @@ function CartView({
 
               <div className="flex justify-between items-center mt-5">
                 <div className="font-bold text-xl sm:text-2xl md:text-3xl">
-                  ₴{(item.price * item.quantity * item.rentalDays).toLocaleString()}
+                  ₴
+                  {(
+                    item.price *
+                    item.quantity *
+                    item.rentalDays
+                  ).toLocaleString()}
                 </div>
                 <Button
                   size="sm"
@@ -533,20 +560,24 @@ function CartView({
       <Card className="border-2 border-yellow-400 xl:col-span-3">
         <CardContent className="p-6">
           <div className="space-y-4">
-            <div className="flex justify-between text-lg font-bold">
+            <div className="flex justify-around text-lg font-bold">
               <span>Загальна сума:</span>
-              <span>₴{totalPrice.toLocaleString()}</span>
+              <span className="text-2xl text-yellow-500">
+                ₴{totalPrice.toLocaleString()}
+              </span>
             </div>
-            <Button
-              className={`w-full text-lg py-6 ${
-                isLoggedIn
-                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
-              }`}
-              onClick={onConfirmRental}
-            >
-              {isLoggedIn ? "Оформити оренду" : "Увійдіть для оформлення"}
-            </Button>
+            <div className="w-full flex items-center justify-center">
+              <Button
+                className={`!w-1/2 text-lg font-bold py-6 rounded-2 !flex justify-center items-center ${
+                  isLoggedIn
+                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                    : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                }`}
+                onClick={onConfirmRental}
+              >
+                {isLoggedIn ? "Оформити" : "Увійдіть для оформлення"}
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground text-center">
               Обладнання можна забрати в день початку оренди з 8:00 до 20:00
             </p>
