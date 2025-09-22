@@ -308,11 +308,12 @@ export default function BookingPage() {
               {/* Список номерів */}
               {searchPerformed && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">
+                  <h2 className="text-2xl !font-semibold">
                     {availableRooms.length > 0
                       ? "Доступні номери"
                       : "Номери не знайдено"}
                   </h2>
+
                   {availableRooms.map((room) => (
                     <Card
                       key={room.id}
@@ -323,7 +324,8 @@ export default function BookingPage() {
                       }`}
                     >
                       <CardContent className="p-6">
-                        <div className="grid md:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                          {/* Картинка */}
                           <div className="md:col-span-1">
                             <img
                               src={room.image || "/placeholder.svg"}
@@ -331,6 +333,8 @@ export default function BookingPage() {
                               className="w-full h-48 object-cover rounded-lg"
                             />
                           </div>
+
+                          {/* Інформація про номер */}
                           <div className="md:col-span-2">
                             <h3 className="text-xl font-bold mb-2">
                               {room.name}
@@ -338,12 +342,14 @@ export default function BookingPage() {
                             <p className="text-muted-foreground mb-4">
                               {room.description}
                             </p>
+
                             <div className="flex items-center gap-2 mb-4">
                               <Users className="h-4 w-4 text-muted-foreground" />
                               <span className="text-sm">
                                 До {room.maxGuests} гостей
                               </span>
                             </div>
+
                             <div className="flex flex-wrap gap-2">
                               {room.amenities.map((amenity) => (
                                 <Badge
@@ -356,7 +362,9 @@ export default function BookingPage() {
                               ))}
                             </div>
                           </div>
-                          <div className="md:col-span-1 text-right">
+
+                          {/* Ціна та кнопка */}
+                          <div className="md:col-span-1 text-right flex flex-col justify-between">
                             <div className="mb-4">
                               <div className="text-3xl font-bold">
                                 ₴{room.price.toLocaleString()}
@@ -373,8 +381,9 @@ export default function BookingPage() {
                                 </div>
                               )}
                             </div>
+
                             <Button
-                              className={`w-full ${
+                              className={`w-1/2 md:w-full rounded-2 font-semibold ${
                                 selectedRoom === room.id
                                   ? "bg-yellow-400 text-black"
                                   : "bg-transparent border-yellow-400 text-yellow-600 hover:bg-yellow-50"
@@ -394,11 +403,12 @@ export default function BookingPage() {
                     </Card>
                   ))}
 
+                  {/* Кнопка продовження бронювання */}
                   {selectedRoom && checkIn && checkOut && (
-                    <div className="flex justify-end">
+                    <div className="flex justify-center">
                       <Button
                         onClick={handleProceedToBooking}
-                        className="bg-yellow-400 text-black hover:bg-yellow-500"
+                        className="bg-yellow-400 text-black hover:bg-yellow-500 !w-1/2 rounded-2 font-semibold"
                       >
                         Продовжити бронювання
                       </Button>

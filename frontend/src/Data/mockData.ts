@@ -1,3 +1,7 @@
+import nomerS from "../assets/nomerS.png"
+import nomerD from "../assets/nomerD.png"
+
+
 export const userData = {
   name: "Олександр Петренко",
   email: "alex.petrenko@email.com",
@@ -195,7 +199,7 @@ export const roomTypes = [
     price: 2500,
     maxGuests: 2,
     amenities: ["Wifi", "Телевізор", "Міні-бар", "Кондиціонер"],
-    image: "/placeholder.svg?height=200&width=300&text=Standard+Room",
+    image: nomerS,
     available: true,
   },
   {
@@ -205,7 +209,7 @@ export const roomTypes = [
     price: 3500,
     maxGuests: 3,
     amenities: ["Wifi", "Балкон", "Міні-бар", "Сейф", "Халати"],
-    image: "/placeholder.svg?height=200&width=300&text=Deluxe+Room",
+    image: nomerD,
     available: true,
   },
   {
