@@ -1,8 +1,7 @@
 using AutoMapper;
 using backend.DTOs.User;
 using backend.Models;
-using backend.Helpers;
-
+ 
 namespace backend.Helpers
 {
     public class MappingProfile : Profile
@@ -27,6 +26,8 @@ namespace backend.Helpers
             .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             // User → InfoUserDto
             CreateMap<User, InfoUserDto>();
+
+              
         }
     }
 }

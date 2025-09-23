@@ -14,16 +14,14 @@ builder.Services.Configure<MongoDbSettings>(
 // Реєструємо MongoDbService як Singleton
 builder.Services.AddSingleton<MongoDbService>();
 
-// Реєструємо UserService як Singleton
-builder.Services.AddSingleton<UserService>();
-
+ 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
 // Services
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<JwtService>();
-
+builder.Services.AddSingleton<BookingService>();
 // Auth - JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]?? throw new InvalidOperationException("JWT Key is not configured."));
 builder.Services.AddAuthentication(options =>
