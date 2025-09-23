@@ -21,6 +21,10 @@ namespace backend.Helpers
                            opt => opt.MapFrom(src => PasswordHasher.Hash(src.Password)));
             // User → UserResponseDto
             CreateMap<User, UserResponseDto>();
-        }
+            // UpdateUserDto → User
+            CreateMap<UpdateUserDto, User>()
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+     }
     }
 }

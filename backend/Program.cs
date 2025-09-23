@@ -25,7 +25,7 @@ builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<JwtService>();
 
 // Auth - JWT
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]?? throw new InvalidOperationException("JWT Key is not configured."));
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -67,8 +67,22 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
+ 
 
 var app = builder.Build();
+
+
+app.UseCors("AllowAll");
+
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -82,4 +96,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.Run();
+app.Run("http://0.0.0.0:5204");

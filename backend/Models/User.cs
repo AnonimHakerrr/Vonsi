@@ -7,22 +7,22 @@ namespace backend.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [BsonElement("firstName")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [BsonElement("lastName")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [BsonElement("email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [BsonElement("phone")]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
         [BsonElement("passwordHash")]
-        public string PasswordHash { get; set; }
+        public string? PasswordHash { get; set; }
 
         [BsonElement("emailVerified")]
         public bool EmailVerified { get; set; }
@@ -33,5 +33,7 @@ namespace backend.Models
         [BsonElement("updatedAt")]
         public DateTime? UpdatedAt { get; set; }
 
+        [BsonElement("photoUrl")]
+        public string? PhotoUrl { get; set; }
     }
 }
