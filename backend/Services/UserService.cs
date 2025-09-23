@@ -62,6 +62,8 @@ namespace backend.Services
 
             if (updates.Count == 0) return null;
 
+            updates.Add(Builders<User>.Update.Set(u => u.UpdatedAt, DateTime.UtcNow));
+
             var updateDefinition = Builders<User>.Update.Combine(updates);
 
             return await _users.FindOneAndUpdateAsync(
