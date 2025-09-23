@@ -25,6 +25,8 @@ namespace backend.Helpers
             CreateMap<UpdateUserDto, User>()
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
             .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-     }
+            // User → InfoUserDto
+            CreateMap<User, InfoUserDto>();
+        }
     }
 }
