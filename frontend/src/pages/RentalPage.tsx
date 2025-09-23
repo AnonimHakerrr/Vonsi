@@ -560,7 +560,7 @@ function CartView({
       <Card className="border-2 border-yellow-400 xl:col-span-3">
         <CardContent className="p-6">
           <div className="space-y-4">
-            <div className="flex justify-around text-lg font-bold">
+            <div className="flex justify-center gap-4 text-lg font-bold">
               <span>Загальна сума:</span>
               <span className="text-2xl text-yellow-500">
                 ₴{totalPrice.toLocaleString()}
@@ -568,7 +568,7 @@ function CartView({
             </div>
             <div className="w-full flex items-center justify-center">
               <Button
-                className={`!w-1/2 text-lg font-bold py-6 rounded-2 !flex justify-center items-center ${
+                className={`!w-1/2 text-lg font-bold py-1 rounded-2 !flex justify-center items-center ${
                   isLoggedIn
                     ? "bg-yellow-400 text-black hover:bg-yellow-500"
                     : "bg-gray-400 text-gray-600 cursor-not-allowed"
