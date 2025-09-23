@@ -17,6 +17,9 @@ builder.Services.AddSingleton<MongoDbService>();
 // Реєструємо UserService як Singleton
 builder.Services.AddSingleton<UserService>();
 
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
 // Services
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<JwtService>();
