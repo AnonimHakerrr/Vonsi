@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
@@ -11,7 +10,9 @@ import {
   DialogTitle,
 } from "../components/Dialog";
 import { Eye, EyeOff } from "lucide-react";
-
+import http_api from "../services/http_api";
+import { useUser } from "../store/UseContext";
+  
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -40,10 +41,34 @@ export function AuthModal({
     setMode(initialMode);
   }, [initialMode]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { setUser } = useUser();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    onClose();
+    try {
+      const res = await http_api.post("/api/Auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log(res.data);
+
+      const { token } = res.data;
+      console.log(token);
+      const user = await http_api.get("/api/Users/me", {
+          headers: {
+             Authorization: `Bearer ${token}`,
+             
+          },
+        });
+
+      console.log(user);
+            localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user.data);
+      onClose();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {

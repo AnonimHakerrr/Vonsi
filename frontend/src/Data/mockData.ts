@@ -7,7 +7,8 @@ import shoes from "../assets/shoes.png"
 import oko from "../assets/oko.png"
 
 export const userData = {
-  name: "Олександр Петренко",
+  name: "Олександр",
+  surename: "Петренко",
   email: "alex.petrenko@email.com",
   phone: "+380 (67) 123-45-67",
   memberSince: "2020",

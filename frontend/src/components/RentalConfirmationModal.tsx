@@ -6,6 +6,7 @@ import { Label } from "./Label";
 import { Textarea } from "./TextArea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
 import { CreditCard, Calendar, MapPin } from "lucide-react";
+import {userData} from "../Data/mockData"
 
 interface CartItem {
   id: string;
@@ -31,10 +32,10 @@ export const RentalConfirmationModal: React.FC<
   RentalConfirmationModalProps
 > = ({ isOpen, onClose, cart, totalPrice, startDate, endDate }) => {
   const [customerData, setCustomerData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: userData.name,
+    lastName: userData.surename,
+    email: userData.email,
+    phone: userData.phone,
     notes: "",
   });
 

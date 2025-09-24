@@ -166,7 +166,7 @@ export default function DashboardPage() {
             {/* Текст */}
             <div className="flex flex-col items-center sm:items-start gap-1 sm:gap-2 text-center sm:text-left">
               <h1 className="text-2xl sm:text-3xl font-black mb-1 sm:mb-2">
-                Вітаємо, {editableUserData.name}!
+                Вітаємо, {editableUserData.name} {editableUserData.surename}!
               </h1>
               <div className="flex flex-col sm:flex-col items-center sm:items-start gap-1 sm:gap-2 text-muted-foreground">
                 <span className="text-sm sm:text-base">
@@ -888,6 +888,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Поля редагування профілю */}
+            <div>
+              <Label>Прізвище</Label>
+              <Input
+                value={editableUserData.surename}
+                onChange={(e) => handleSettingsChange("surename", e.target.value)}
+              />
+            </div>
             <div>
               <Label>Ім’я</Label>
               <Input

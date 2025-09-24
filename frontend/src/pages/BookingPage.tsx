@@ -26,7 +26,7 @@ import {
 import { Textarea } from "../components/TextArea";
 import { SidebarMenu } from "../components/SidebarMenu";
 import { AuthModal } from "../components/AuthModal";
-
+import { userData } from "../Data/mockData";
 import { roomTypes } from "../Data/mockData";
 
 export default function BookingPage() {
@@ -40,10 +40,10 @@ export default function BookingPage() {
   const [isLoggedIn] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [bookingData, setBookingData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: userData.name,
+    lastName: userData.surename,
+    email: userData.email,
+    phone: userData.phone,
     specialRequests: "",
   });
 
@@ -240,10 +240,10 @@ export default function BookingPage() {
                               setCheckIn(date)
                             }
                             disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0); // обнуляємо час
-                            return date < today;
-                          }}
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0); // обнуляємо час
+                              return date < today;
+                            }}
                           />
                         </PopoverContent>
                       </Popover>
@@ -274,10 +274,10 @@ export default function BookingPage() {
                               setCheckOut(date)
                             }
                             disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0); // обнуляємо час
-                            return date < today;
-                          }}
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0); // обнуляємо час
+                              return date < today;
+                            }}
                           />
                         </PopoverContent>
                       </Popover>
@@ -607,11 +607,11 @@ export default function BookingPage() {
                       </div>
                       <div className="flex justify-center">
                         <Button
-                        onClick={handleBooking}
-                        className="!flex items-center !w-1/2 justify-center bg-yellow-400 text-black hover:bg-yellow-500 px-8 py-3 text-lg rounded-2 font-bold"
-                      >
-                        Готово
-                      </Button>
+                          onClick={handleBooking}
+                          className="!flex items-center !w-1/2 justify-center bg-yellow-400 text-black hover:bg-yellow-500 px-8 py-3 text-lg rounded-2 font-bold"
+                        >
+                          Готово
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
