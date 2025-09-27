@@ -51,7 +51,7 @@ namespace backend.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result.Data);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] Booking updatedBooking)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -63,7 +63,7 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
