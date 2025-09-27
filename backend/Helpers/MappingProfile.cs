@@ -1,8 +1,7 @@
 using AutoMapper;
 using backend.DTOs.User;
 using backend.Models;
-using backend.Helpers;
-
+ 
 namespace backend.Helpers
 {
     public class MappingProfile : Profile
@@ -21,6 +20,14 @@ namespace backend.Helpers
                            opt => opt.MapFrom(src => PasswordHasher.Hash(src.Password)));
             // User → UserResponseDto
             CreateMap<User, UserResponseDto>();
+            // UpdateUserDto → User
+            CreateMap<UpdateUserDto, User>()
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            // User → InfoUserDto
+            CreateMap<User, InfoUserDto>();
+
+              
         }
     }
 }

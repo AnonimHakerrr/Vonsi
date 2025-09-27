@@ -69,7 +69,7 @@ namespace backend.Controllers
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
-            if (!PasswordHasher.Verify(dto.Password, user.PasswordHash))
+            if (string.IsNullOrEmpty(user.PasswordHash) || !PasswordHasher.Verify(dto.Password, user.PasswordHash))
                 return Unauthorized("Invalid email or password");
 
             // Генеруємо JWT токен
