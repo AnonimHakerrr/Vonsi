@@ -11,8 +11,7 @@ import {
 } from "../components/Dialog";
 import { Eye, EyeOff } from "lucide-react";
 import http_api from "../services/http_api";
-import { useUser } from "../store/UseContext";
-  
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,31 +40,40 @@ export function AuthModal({
     setMode(initialMode);
   }, [initialMode]);
 
-  const { setUser } = useUser();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await http_api.post("/api/Auth/login", {
-        email: formData.email,
-        password: formData.password,
-      });
-      console.log(res.data);
-
-      const { token } = res.data;
-      console.log(token);
-      const user = await http_api.get("/api/Users/me", {
-          headers: {
-             Authorization: `Bearer ${token}`,
-             
-          },
+      if (mode === "login") {
+        const res = await http_api.post("/api/Auth/login", {
+          email: formData.email,
+          password: formData.password,
         });
+        console.log(res.data);
 
-      console.log(user);
-            localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      setUser(user.data);
-      onClose();
+        const { token, user } = res.data;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.reload();
+        onClose();
+      } else if (mode === "register") {
+        const res = await http_api.post("/api/Auth/register", {
+          phone: formData.phone,
+          password: formData.password,
+          passwordConfirm: formData.confirmPassword,
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        });
+        console.log(res.data);
+
+        const { token, user } = res.data;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.reload();
+        onClose();
+      }
     } catch (err) {
       console.error(err);
     }
@@ -77,17 +85,17 @@ export function AuthModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white !rounded-xl shadow-lg text-black">
+      <DialogContent className="sm:max-w-md bg-white !rounded-xl shadow-lg text-black max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-center gap-2 mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-20 w-25 text-yellow-400"
+              className="h-20 w-20 !text-yellow-400"
               width="1024"
               height="1024"
               viewBox="0 0 1024 1024"
             >
-              <g fill="black" stroke="none">
+              <g fill="currentColor" stroke="none">
                 <path d="M 690 825 L 690 833 L 691 834 L 691 836 L 706 836 L 707 837 L 707 884 L 708 885 L 720 885 L 720 837 L 721 836 L 737 836 L 737 825 Z" />
                 <path d="M 617 825 L 617 884 L 629 884 L 630 883 L 630 865 L 631 864 L 638 864 L 642 869 L 643 872 L 645 874 L 646 877 L 651 884 L 665 884 L 665 882 L 653 865 L 653 862 L 661 855 L 662 851 L 663 850 L 663 839 L 662 838 L 661 834 L 656 829 L 652 827 L 650 827 L 649 826 L 645 826 L 644 825 Z" />
                 <path d="M 630 837 L 631 836 L 643 836 L 644 837 L 646 837 L 650 841 L 650 848 L 646 852 L 645 852 L 644 853 L 640 853 L 639 854 L 631 854 L 630 853 Z" />

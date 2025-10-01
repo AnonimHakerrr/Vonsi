@@ -41,7 +41,11 @@ export default function HomePage() {
               <a href="/booking" className="!no-underline">
                 <Button
                   size="lg"
-                  className="!flex !items-center !justify-center bg-yellow-400 text-black hover:bg-yellow-500 !text-lg px-8 py-4 !rounded-lg font-bold !no-underline"
+                  className=" !flex !items-center !justify-center 
+                    bg-yellow-400 text-black hover:bg-yellow-500 
+                    !text-lg md:!text-base sm:!text-sm 
+                    px-8 py-4 md:px-6 md:py-3 sm:px-4 sm:py-2 
+                    !rounded-lg font-bold !no-underline"
                   style={{ textDecoration: "none" }}
                 >
                   Забронювати номер
@@ -51,7 +55,12 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="!flex !items-center !justify-center border-white text-white !hover:bg-white !hover:text-black !text-lg !px-8 !py-4 !rounded-lg font-bold !no-underline"
+                  className="!flex !items-center !justify-center 
+                    border-white text-white 
+                    !hover:bg-white !hover:text-black 
+                    !text-lg md:!text-base sm:!text-sm 
+                    !px-8 !py-4 md:!px-6 md:!py-3 sm:!px-4 sm:!py-2 
+                    !rounded-lg font-bold !no-underline"
                 >
                   Орендувати обладнання
                 </Button>
@@ -162,7 +171,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-yellow-400" />
-                  <span>info@alpineresort.ua</span>
+                  <span>VONSI_RESORT@gmail.com</span>
                 </div>
               </div>
             </div>

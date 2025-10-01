@@ -8,7 +8,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   phone:string;
-  channelPhoto?: string;
+  photoUrl: string;
 }
 
 // --- Збереження токена і користувача ---

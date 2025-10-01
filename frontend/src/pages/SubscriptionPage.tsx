@@ -114,8 +114,8 @@ export default function SkiPassesPage() {
                   >
                     <Mountain className="h-10 w-10 text-white" />
                   </div>
-                  <CardTitle className="text-2xl font-bold">
-                    {pass.name} <span className="text-yellow-400">абонемент</span>
+                  <CardTitle className="text-xl font-bold">
+                    {pass.name} <span className="text-yellow-400 lg:!text-md ">абонемент</span>
                   </CardTitle>
                   <CardDescription className="text-sm">
                     {pass.description}
@@ -259,7 +259,7 @@ export default function SkiPassesPage() {
                 </div>
 
                 {/* Summary */}
-                <div className="bg-muted p-4 rounded-lg space-y-2 w-full">
+                <div className="bg-muted  rounded-lg space-y-2 w-full">
                   <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                     <span>Абонемент:</span>
                     <span>
@@ -282,7 +282,7 @@ export default function SkiPassesPage() {
                   {startDate && (
                     <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                       <span>Дата початку:</span>
-                      <span>
+                      <span className="text-right">
                         {format(startDate, "dd MMMM yyyy", { locale: uk })}
                       </span>
                     </div>
@@ -299,7 +299,7 @@ export default function SkiPassesPage() {
                 <div className="flex justify-center w-full">
                   <Button
                     onClick={handlePurchase}
-                    className="w-1/2 sm:w-1/2 md:w-1/2 lg:w-1/2 bg-yellow-400 text-black hover:bg-yellow-500 font-bold rounded-2 text-sm sm:!text-base md:text-lg lg:text-xl"
+                    className="w-1/2 sm:w-1/2 md:w-1/2 lg:w-1/2 bg-yellow-400 text-black hover:bg-yellow-500 font-bold rounded-2 text-sm sm:text-base md:!text-sm lg:!text-xl"
                     disabled={!startDate}>
                     Придбати абонемент
                   </Button>

@@ -6,7 +6,7 @@ import { Label } from "./Label";
 import { Textarea } from "./TextArea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
 import { CreditCard, Calendar, MapPin } from "lucide-react";
-import {userData} from "../Data/mockData"
+import { userData } from "../Data/mockData";
 
 interface CartItem {
   id: string;
@@ -72,12 +72,12 @@ export const RentalConfirmationModal: React.FC<
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl max-h-[90vh] overflow-y-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg">
         <DialogHeader>
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start  ">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-15 w-15 !text-yellow-400"
+              className="h-12 w-12 sm:h-14 sm:w-14 text-yellow-400"
               width="1024"
               height="1024"
               viewBox="0 0 1024 1024"
@@ -108,23 +108,23 @@ export const RentalConfirmationModal: React.FC<
                 <path d="M 505 145 L 508 152 L 516 197 L 503 225 L 501 246 L 519 231 L 523 230 L 551 296 L 548 297 L 530 284 L 527 284 L 495 309 L 491 310 L 490 307 L 501 285 L 497 285 L 465 298 L 441 305 L 441 298 L 460 251 L 431 276 L 428 276 L 411 246 L 499 149 Z" />
               </g>
             </svg>
-            <span className="text-xl font-bold">
+            <span className="text-lg sm:text-xl font-bold text-center sm:text-left">
               VONSI <span className="text-yellow-400">RESORT</span>
             </span>
           </div>
-          <DialogTitle className="text-center !font-semibold text-xl">
+          <DialogTitle className="text-center sm:text-left font-semibold text-lg sm:text-xl">
             Підтвердження оренди
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-1">
           {/* Rental Summary */}
-          <div className="bg-muted p-4 rounded-lg">
-            <h4 className="font-semibold mb-3 flex items-center gap-2 ">
-              <Calendar className="h-5 w-5" />
+          <div className="bg-muted p-2 sm:p-3 rounded-lg">
+            <h4 className="font-semibold mb-2 sm:mb-2 flex items-center gap-2 text-sm sm:text-base">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
               Деталі оренди
             </h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
               <div>
                 <span className="text-muted-foreground">Дата початку:</span>
                 <div className="font-medium">
@@ -142,27 +142,31 @@ export const RentalConfirmationModal: React.FC<
 
           {/* Equipment List */}
           <div>
-            <h3 className="font-semibold mb-3">Обране обладнання</h3>
-            <div className="space-y-3 max-h-40 overflow-y-auto">
+            <h3 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">
+              Обране обладнання
+            </h3>
+            <div className="space-y-2 sm:space-y-3 max-h-40 overflow-y-auto">
               {cart.map((item) => (
                 <div
                   key={`${item.id}-${item.selectedSize}`}
-                  className="flex items-center gap-3 p-3 bg-muted rounded-lg"
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted rounded-lg"
                 >
                   <img
                     src={item.image || "/placeholder.svg"}
                     alt={item.name}
-                    className="w-12 h-12 object-cover rounded"
+                    className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
                   />
-                  <div className="flex-1">
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                  <div className="flex-1 w-full sm:w-auto">
+                    <div className="font-medium text-sm sm:text-base">
+                      {item.name}
+                    </div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       {item.brand}{" "}
                       {item.selectedSize && `• ${item.selectedSize}`}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-medium">
+                  <div className="text-right mt-1 sm:mt-0">
+                    <div className="font-medium text-sm sm:text-base">
                       ₴
                       {(
                         item.price *
@@ -170,7 +174,7 @@ export const RentalConfirmationModal: React.FC<
                         item.rentalDays
                       ).toLocaleString()}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       {item.quantity} шт. × {item.rentalDays} дн.
                     </div>
                   </div>
@@ -181,11 +185,16 @@ export const RentalConfirmationModal: React.FC<
 
           {/* Customer Information */}
           <div>
-            <h4 className="font-semibold mb-2">Контактна інформація</h4>
-            <div className="grid grid-cols-2 gap-4">
+            <h4 className="font-semibold mb-2 text-sm sm:text-base">
+              Контактна інформація
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               {["firstName", "lastName", "email", "phone"].map((field) => (
-                <div key={field} className="space-y-2">
-                  <Label htmlFor={field} className="font-semibold">
+                <div key={field} className="space-y-1 sm:space-y-2">
+                  <Label
+                    htmlFor={field}
+                    className="font-semibold text-xs sm:text-sm"
+                  >
                     {field === "firstName"
                       ? "Ім'я *"
                       : field === "lastName"
@@ -213,12 +222,16 @@ export const RentalConfirmationModal: React.FC<
                         : field
                     }`}
                     required
+                    className="text-xs sm:text-sm"
                   />
                 </div>
               ))}
             </div>
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="notes" className="font-semibold">
+            <div className="space-y-1 sm:space-y-2 mt-3 sm:mt-4">
+              <Label
+                htmlFor="notes"
+                className="font-semibold text-xs sm:text-sm"
+              >
                 Додаткові побажання
               </Label>
               <Textarea
@@ -227,30 +240,31 @@ export const RentalConfirmationModal: React.FC<
                 onChange={(e) => handleInputChange("notes", e.target.value)}
                 placeholder="Вкажіть будь-які особливі побажання..."
                 rows={3}
+                className="text-xs sm:text-sm"
               />
             </div>
           </div>
 
           {/* Payment Method */}
           <div>
-            <h4 className="font-semibold mb-3 flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
+            <h4 className="font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+              <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
               Спосіб оплати
             </h4>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               <Button
-                className={`!flex rounded-2 ${
+                className={`!flex rounded-2 text-xs sm:text-sm ${
                   paymentMethod === "card"
                     ? "bg-yellow-400 text-black font-bold"
                     : "bg-white"
                 }`}
                 onClick={() => setPaymentMethod("card")}
               >
-                <CreditCard className="!h-5 !w-5" />
+                <CreditCard className="!h-4 !w-4 sm:!h-5 sm:!w-5" />
                 Картка
               </Button>
               <Button
-                className={`rounded-2 ${
+                className={`rounded-2 text-xs sm:text-sm ${
                   paymentMethod === "cash"
                     ? "bg-yellow-400 text-black font-bold"
                     : "bg-white"
@@ -263,12 +277,12 @@ export const RentalConfirmationModal: React.FC<
           </div>
 
           {/* Pickup Info */}
-          <div className="bg-yellow-50 p-4 rounded-2">
-            <h4 className="font-semibold mb-2 flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
+          <div className="bg-yellow-50 p-3 sm:p-4 rounded-2">
+            <h4 className="font-semibold mb-1 sm:mb-2 flex items-center gap-2 text-sm sm:text-base">
+              <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
               Інформація про отримання
             </h4>
-            <div className="text-sm space-y-1">
+            <div className="text-xs sm:text-sm space-y-1">
               <p>
                 <strong>Адреса:</strong> VONSI RESORT, Карпати, Україна
               </p>
@@ -282,32 +296,34 @@ export const RentalConfirmationModal: React.FC<
           </div>
 
           {/* Total and Actions */}
-          <div className="border-t pt-4">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-lg font-bold">Загальна сума:</span>
-              <span className="text-2xl font-bold text-yellow-600">
+          <div className="border-t pt-3 sm:pt-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4 gap-2 sm:gap-0">
+              <span className="text-base sm:text-lg font-bold">
+                Загальна сума:
+              </span>
+              <span className="text-lg sm:text-2xl font-bold text-yellow-600">
                 ₴{totalPrice.toLocaleString()}
               </span>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 onClick={handleConfirmRental}
                 disabled={!isFormValid()}
-                className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 rounded-2"
+                className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 rounded-2 text-sm sm:text-base p-2"
               >
                 Підтвердити оренду
               </Button>
               <Button
                 variant="outline"
                 onClick={onClose}
-                className="flex-1 bg-transparent rounded-2"
+                className="flex-1 bg-transparent rounded-2 text-sm sm:text-base p-2"
               >
                 Скасувати
               </Button>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center mt-2">
+            <p className="text-xs sm:text-sm text-muted-foreground text-center mt-2">
               Натискаючи "Підтвердити оренду", ви погоджуєтесь з умовами оренди
             </p>
           </div>

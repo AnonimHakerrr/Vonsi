@@ -1,5 +1,6 @@
 // src/pages/BookingPage.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CalendarIcon, Users, Check, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
@@ -26,24 +27,41 @@ import {
 import { Textarea } from "../components/TextArea";
 import { SidebarMenu } from "../components/SidebarMenu";
 import { AuthModal } from "../components/AuthModal";
-import { userData } from "../Data/mockData";
-import { roomTypes } from "../Data/mockData";
+//import { userData } from "../Data/mockData";
+//import { roomTypes } from "../Data/mockData";
+import { useUser } from "../store/UseContext";
+
+import http_api from "../services/http_api";
+import { getToken } from "../services/tokenService";
+//import { Description } from "@radix-ui/react-dialog";
 
 export default function BookingPage() {
+  const navigate = useNavigate();
+  type Room = {
+    id: string;
+    title: string;
+    description: string;
+    pricePerNight: number;
+    capacity: number;
+    type: string;
+    images: string[];
+    amenities: string[];
+  };
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [guests, setGuests] = useState("2");
   const [selectedRoom, setSelectedRoom] = useState<string>("");
   const [step, setStep] = useState(1);
   const [searchPerformed, setSearchPerformed] = useState(false);
-  const [availableRooms, setAvailableRooms] = useState(roomTypes);
-  const [isLoggedIn] = useState(true);
+  const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
+  const { user } = useUser();
+
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [bookingData, setBookingData] = useState({
-    firstName: userData.name,
-    lastName: userData.surename,
-    email: userData.email,
-    phone: userData.phone,
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
     specialRequests: "",
   });
 
@@ -55,15 +73,30 @@ export default function BookingPage() {
     return checkIn && checkOut && guests && checkIn < checkOut;
   };
 
-  const handleSearch = () => {
+  //отримати список вільних номерів
+  const handleSearch = async () => {
     if (!isSearchFormValid()) return;
-    const guestCount = Number.parseInt(guests);
-    const filtered = roomTypes.filter(
-      (room) => room.maxGuests >= guestCount && room.available
-    );
-    setAvailableRooms(filtered);
-    setSearchPerformed(true);
-    setSelectedRoom("");
+
+    try {
+      const response = await http_api.get("api/Rooms/rooms", {
+        params: {
+          from: checkIn ? format(checkIn, "yyyy-MM-dd") : undefined,
+          to: checkOut ? format(checkOut, "yyyy-MM-dd") : undefined,
+          capacity: Number(guests),
+        },
+      });
+
+      if (response.status === 200) {
+        setAvailableRooms(response.data); // отримані з бекенду вільні номери
+        setSearchPerformed(true);
+        setSelectedRoom("");
+      } else {
+        throw new Error("Не вдалося отримати вільні номери");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Не вдалося отримати доступні номери. Спробуйте пізніше.");
+    }
   };
 
   const calculateNights = () => {
@@ -75,32 +108,69 @@ export default function BookingPage() {
   };
 
   const calculateTotal = () => {
-    const room = roomTypes.find((r) => r.id === selectedRoom);
+    const room = availableRooms.find((r) => r.id === selectedRoom);
     if (room && checkIn && checkOut) {
-      return room.price * calculateNights();
+      return room.pricePerNight * calculateNights();
     }
     return 0;
   };
 
   const handleProceedToBooking = () => {
-    if (!isLoggedIn) {
+    if (!user) {
       setAuthModalOpen(true);
       return;
     }
     setStep(2);
   };
 
-  const handleBooking = () => {
-    console.log("Booking submitted:", {
-      room: selectedRoom,
-      checkIn,
-      checkOut,
-      guests,
-      ...bookingData,
-      total: calculateTotal(),
-    });
-    alert("Бронювання успішно створено!");
+  const handleBooking = async () => {
+    if (!selectedRoom || !checkIn || !checkOut) {
+      alert("Будь ласка, оберіть номер та дати.");
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      setAuthModalOpen(true);
+      return;
+    }
+
+    const payload = {
+      roomId: selectedRoom,
+      checkIn: checkIn ? format(checkIn, "yyyy-MM-dd") : undefined,
+      checkOut: checkOut ? format(checkOut, "yyyy-MM-dd") : undefined,
+    };
+
+    try {
+      const response = await http_api.post(
+        "api/Booking/createBooking",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+      if (response.status === 200) {
+        alert("Бронювання успішно створено!");
+        localStorage.removeItem("selectedRoom"); // очистка
+        setStep(1); // або редірект на іншу сторінку
+        navigate("/dashboard");
+      } else {
+        throw new Error("Не вдалося створити бронювання");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Не вдалося створити бронювання. Спробуйте пізніше.");
+    }
   };
+
+  useEffect(() => {
+    const savedRoom = localStorage.getItem("selectedRoom");
+    if (savedRoom) setSelectedRoom(savedRoom);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -276,7 +346,7 @@ export default function BookingPage() {
                             disabled={(date) => {
                               const today = new Date();
                               today.setHours(0, 0, 0, 0); // обнуляємо час
-                              return date < today;
+                              return checkIn ? date < checkIn : date < today;
                             }}
                           />
                         </PopoverContent>
@@ -334,12 +404,12 @@ export default function BookingPage() {
                       }`}
                     >
                       <CardContent className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                           {/* Картинка */}
                           <div className="md:col-span-1">
                             <img
-                              src={room.image || "/placeholder.svg"}
-                              alt={room.name}
+                              src={room.images[0] || room.images[1]}
+                              alt={room.title}
                               className="w-full h-48 object-cover rounded-lg"
                             />
                           </div>
@@ -347,7 +417,7 @@ export default function BookingPage() {
                           {/* Інформація про номер */}
                           <div className="md:col-span-2">
                             <h3 className="text-xl font-bold mb-2">
-                              {room.name}
+                              {room.title}
                             </h3>
                             <p className="text-muted-foreground mb-4">
                               {room.description}
@@ -356,7 +426,7 @@ export default function BookingPage() {
                             <div className="flex items-center gap-2 mb-4">
                               <Users className="h-4 w-4 text-muted-foreground" />
                               <span className="text-sm">
-                                До {room.maxGuests} гостей
+                                До {room.capacity} гостей
                               </span>
                             </div>
 
@@ -377,7 +447,7 @@ export default function BookingPage() {
                           <div className="md:col-span-1 text-right flex flex-col justify-between">
                             <div className="mb-4">
                               <div className="text-3xl font-bold">
-                                ₴{room.price.toLocaleString()}
+                                ₴{room.pricePerNight?.toLocaleString() ?? "Н/Д"}
                               </div>
                               <div className="text-sm text-muted-foreground">
                                 за ніч
@@ -385,15 +455,17 @@ export default function BookingPage() {
                               {checkIn && checkOut && (
                                 <div className="text-lg font-semibold text-yellow-600 mt-2">
                                   Всього: ₴
-                                  {(
-                                    room.price * calculateNights()
-                                  ).toLocaleString()}
+                                  {room.pricePerNight && calculateNights()
+                                    ? (
+                                        room.pricePerNight * calculateNights()
+                                      ).toLocaleString()
+                                    : "Н/Д"}
                                 </div>
                               )}
                             </div>
 
                             <Button
-                              className={`w-1/2 md:w-full rounded-2 font-semibold ${
+                              className={`w-1/2 md:w-full rounded-2 font-semibold lg:!text-md !text-base ${
                                 selectedRoom === room.id
                                   ? "bg-yellow-400 text-black"
                                   : "bg-transparent border-yellow-400 text-yellow-600 hover:bg-yellow-50"
@@ -401,11 +473,14 @@ export default function BookingPage() {
                               variant={
                                 selectedRoom === room.id ? "default" : "outline"
                               }
-                              onClick={() => setSelectedRoom(room.id)}
+                              onClick={() => {
+                                setSelectedRoom(room.id);
+                                localStorage.setItem("selectedRoom", room.id);
+                              }}
                             >
                               {selectedRoom === room.id
                                 ? "Обрано"
-                                : "Обрати номер"}
+                                : "Обрати"}
                             </Button>
                           </div>
                         </div>
@@ -418,7 +493,9 @@ export default function BookingPage() {
                     <div className="flex justify-center">
                       <Button
                         onClick={handleProceedToBooking}
-                        className="bg-yellow-400 text-black hover:bg-yellow-500 !w-1/2 rounded-2 font-semibold"
+                        className="bg-yellow-400 text-black hover:bg-yellow-500 
+                        w-full sm:!w-1/2 rounded-2 font-semibold 
+                        !text-xs md:!text-sm lg:!text-lg sm:!text-sm"
                       >
                         Продовжити бронювання
                       </Button>
@@ -435,7 +512,7 @@ export default function BookingPage() {
               <CardHeader>
                 <CardTitle className="font-bold">Деталі бронювання</CardTitle>
                 <CardDescription>
-                  Заповніть контактну інформацію
+                  Перегляньте контактну інформацію
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 w-full">
@@ -444,7 +521,7 @@ export default function BookingPage() {
                     <Label htmlFor="firstName">Ім'я</Label>
                     <Input
                       id="firstName"
-                      value={bookingData.firstName}
+                      value={user?.firstName}
                       onChange={(e) =>
                         handleInputChange("firstName", e.target.value)
                       }
@@ -456,7 +533,7 @@ export default function BookingPage() {
                     <Label htmlFor="lastName">Прізвище</Label>
                     <Input
                       id="lastName"
-                      value={bookingData.lastName}
+                      value={user?.lastName}
                       onChange={(e) =>
                         handleInputChange("lastName", e.target.value)
                       }
@@ -472,7 +549,7 @@ export default function BookingPage() {
                     <Input
                       id="email"
                       type="email"
-                      value={bookingData.email}
+                      value={user?.email}
                       onChange={(e) =>
                         handleInputChange("email", e.target.value)
                       }
@@ -485,7 +562,7 @@ export default function BookingPage() {
                     <Input
                       id="phone"
                       type="tel"
-                      value={bookingData.phone}
+                      value={user?.phone}
                       onChange={(e) =>
                         handleInputChange("phone", e.target.value)
                       }
@@ -499,7 +576,6 @@ export default function BookingPage() {
                   <Label htmlFor="requests">Особливі побажання</Label>
                   <Textarea
                     id="requests"
-                    value={bookingData.specialRequests}
                     onChange={(e) =>
                       handleInputChange("specialRequests", e.target.value)
                     }
@@ -517,7 +593,10 @@ export default function BookingPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => setStep(1)}
+                    onClick={() => {
+                      setStep(1);
+                      localStorage.removeItem("selectedRoom");
+                    }}
                     className="bg-transparent !w-1/4 rounded-2 font-semibold"
                   >
                     Назад
@@ -540,28 +619,38 @@ export default function BookingPage() {
                       Перевірте деталі вашого бронювання
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-center gap-3">
-                      <h4 className="">Обраний номер: </h4>
-                      <div className="bg-muted rounded-lg">
-                        <h5 className="!text-lg !font-bold">
-                          {roomTypes.find((r) => r.id === selectedRoom)?.name}
+                  <CardContent className="">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="!text-base md:!text-base lg:!text-lg xl:!text-xl font-medium">
+                        Обраний номер:
+                      </h4>
+
+                      <div className="bg-muted rounded-lg px-2 py-1">
+                        <h5 className="!text-base md:!text-base lg:!text-lg xl:!text-xl !font-bold">
+                          {
+                            availableRooms.find((r) => r.id === selectedRoom)
+                              ?.title
+                          }
                         </h5>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center gap-20">
-                      <div>
-                        <h4 className="">Дата заїзду</h4>
-                        <div className="bg-muted rounded-lg font-bold">
+                    <div className="flex flex-col  justify-between gap-3">
+                      <div className="flex justify-between">
+                        <h4 className="!text-base md:!text-base lg:!text-lg xl:!text-xl">
+                          Дата заїзду
+                        </h4>
+                        <div className="bg-muted rounded-lg font-bold !text-base md:!text-base lg:!text-lg xl:!text-xl">
                           {checkIn
                             ? format(checkIn, "dd MMMM yyyy", { locale: uk })
                             : "Не обрано"}
                         </div>
                       </div>
-                      <div>
-                        <h4 className="font-semibold">Дата виїзду</h4>
-                        <div className="bg-muted rounded-lg font-bold">
+                      <div className="flex justify-between">
+                        <h4 className="font-semibold !text-base md:!text-base lg:!text-lg xl:!text-xl">
+                          Дата виїзду
+                        </h4>
+                        <div className="bg-muted rounded-lg font-bold !text-base md:!text-base lg:!text-lg xl:!text-xl">
                           {checkOut
                             ? format(checkOut, "dd MMMM yyyy", { locale: uk })
                             : "Не обрано"}
@@ -569,25 +658,32 @@ export default function BookingPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-15 justify-center">
-                      <h4 className="">Гості: </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="!text-base md:!text-base lg:!text-lg xl:!text-xl">
+                        Гості:{" "}
+                      </h4>
                       <div className="bg-muted rounded-lg font-bold">
-                        <h5 className="!font-bold">{guests} гостей</h5>
+                        <h5 className="!font-bold !text-base md:!text-base lg:!text-lg xl:!text-xl">
+                          {guests} гостей
+                        </h5>
                       </div>
                     </div>
 
-                    <div className="flex justify-center  gap-8">
-                      <h4 className="font-semibold text-right">
+                    <div className="flex flex-col md:flex-row justify-start md:justify-between  ">
+                      {/* Ліва колонка: заголовок */}
+                      <h4 className="font-semibold !text-base md:!text-base lg:!text-lg xl:!text-xl m-0">
                         Контактні дані:
                       </h4>
-                      <div className="bg-muted rounded-lg flex flex-col w-1/3  justify-around font-bold">
+
+                      {/* Права колонка: інформація */}
+                      <div className="bg-muted rounded-lg flex flex-col w-full md:w-3/4 justify-start md:justify-around font-bold !text-base md:!text-base lg:!text-lg xl:!text-xl text-left md:text-right">
                         <div className="break-all">
-                          {bookingData.firstName} {bookingData.lastName}
+                          {user?.firstName} {user?.lastName}
                         </div>
-                        <div className="break-all">{bookingData.email}</div>
-                        <div className="break-all">{bookingData.phone}</div>
+                        <div className="break-all">{user?.email}</div>
+                        <div className="break-all">{user?.phone}</div>
                         {bookingData.specialRequests && (
-                          <div className="pt-2 border-t break-all text-sm">
+                          <div className="pt-2 border-t break-all text-sm md:text-sm lg:text-base">
                             {bookingData.specialRequests}
                           </div>
                         )}
@@ -596,7 +692,7 @@ export default function BookingPage() {
 
                     <div className=" justify-between items-center">
                       <div className="">
-                        <div className="flex items-center justify-around pb-10">
+                        <div className="flex items-center justify-between pb-10">
                           <h4 className="font-semibold mb-2">
                             Всього до сплати:{" "}
                           </h4>

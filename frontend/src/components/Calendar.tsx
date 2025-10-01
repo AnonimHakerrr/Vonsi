@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DayPicker, type PropsSingle,  type Modifiers } from "react-day-picker";
+import { DayPicker, type PropsSingle, type Modifiers } from "react-day-picker";
 import { cn } from "../lib/utils";
 import { cva } from "class-variance-authority";
 
@@ -8,7 +8,7 @@ interface CalendarProps extends PropsSingle {
   showOutsideDays?: boolean;
   classNames?: Record<string, string>;
   disabled?: (date: Date) => boolean;
-  onSelectDate?: (date: Date | undefined) => void; // новий проп
+  onSelectDate?: (date: Date | undefined) => void;
 }
 
 const buttonVariants = cva(
@@ -18,8 +18,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-yellow-400 text-black hover:bg-yellow-300",
         ghost: "hover:bg-yellow-100 hover:text-black",
-        outline:
-          "border bg-white text-black hover:bg-yellow-50 hover:text-black",
+        outline: "border bg-white text-black hover:bg-yellow-50 hover:text-black",
       },
     },
     defaultVariants: {
@@ -41,6 +40,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 }) => {
   const [month, setMonth] = useState(new Date());
   const [internalSelected, setInternalSelected] = useState<Date | undefined>();
+  const [isVisible, setIsVisible] = useState(true);
 
   const isControlled = selected !== undefined && onSelect !== undefined;
   const currentSelected = isControlled ? selected : internalSelected;
@@ -52,13 +52,15 @@ export const Calendar: React.FC<CalendarProps> = ({
     e: React.MouseEvent | React.KeyboardEvent
   ) => {
     if (isControlled) {
-      // передаємо лише selected в батьківський компонент
       onSelect?.(selected, triggerDate, modifiers, e);
     } else {
       setInternalSelected(selected);
     }
-    // новий проп для зручності батька
+
     onSelectDate?.(selected);
+
+    // приховуємо календар, але не демонтуємо
+    setIsVisible(false);
   };
 
   const handlePrev = () =>
@@ -67,7 +69,12 @@ export const Calendar: React.FC<CalendarProps> = ({
     setMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1));
 
   return (
-    <div className="p-4 bg-black rounded-lg inline-block relative">
+    <div
+      className={cn(
+        "p-4 bg-black rounded-lg inline-block relative",
+        !isVisible && "hidden"
+      )}
+    >
       <h3 className="text-white text-center text-base font-semibold mb-2">
         Виберіть дату
       </h3>
@@ -79,7 +86,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       <DayPicker
         {...props}
         mode="single"
-        selected={currentSelected}
+        selected={currentSelected} // остання вибрана дата завжди виділена
         onSelect={handleSelect}
         month={month}
         onMonthChange={setMonth}

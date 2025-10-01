@@ -213,11 +213,27 @@ export default function RentalPage() {
                         <Calendar
                           mode="single"
                           selected={startDate}
-                          onSelectDate={setStartDate} // твій новий проп
+                          onSelectDate={(date) => {
+                            if (!date) return;
+
+                            // Забороняємо однакові дати
+                            if (endDate && date >= endDate) {
+                              setStartDate(
+                                new Date(
+                                  endDate.getTime() - 24 * 60 * 60 * 1000
+                                )
+                              ); // день до endDate
+                            } else {
+                              setStartDate(date);
+                            }
+                          }}
                           disabled={(date) => {
                             const today = new Date();
-                            today.setHours(0, 0, 0, 0); // обнуляємо час
-                            return date < today;
+                            today.setHours(0, 0, 0, 0);
+                            // Забороняємо дати в минулому і однакові з endDate
+                            return (
+                              date < today || (endDate ? date > endDate : false)
+                            );
                           }}
                         />
                       </PopoverContent>
@@ -241,12 +257,29 @@ export default function RentalPage() {
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={startDate}
-                          onSelectDate={setEndDate} // твій новий проп
+                          selected={endDate}
+                          onSelectDate={(date) => {
+                            if (!date) return;
+
+                            // Забороняємо однакові дати
+                            if (startDate && date <= startDate) {
+                              setEndDate(
+                                new Date(
+                                  startDate.getTime() + 24 * 60 * 60 * 1000
+                                )
+                              ); // день після startDate
+                            } else {
+                              setEndDate(date);
+                            }
+                          }}
                           disabled={(date) => {
                             const today = new Date();
-                            today.setHours(0, 0, 0, 0); // обнуляємо час
-                            return date < today;
+                            today.setHours(0, 0, 0, 0);
+                            // Забороняємо дати в минулому і однакові з startDate
+                            return (
+                              date < today ||
+                              (startDate ? date <= startDate : false)
+                            );
                           }}
                         />
                       </PopoverContent>
@@ -275,14 +308,14 @@ export default function RentalPage() {
                         variant={
                           selectedCategory === category.id ? "default" : "ghost"
                         }
-                        className={`w-full !flex justify-start rounded-2 ${
+                        className={`w-full !flex justify-start rounded-2 !px-1 ${
                           selectedCategory === category.id
                             ? "bg-yellow-400 text-black hover:bg-yellow-500"
                             : "bg-transparent"
                         }`}
                         onClick={() => setSelectedCategory(category.id)}
                       >
-                        <category.icon className="h-4 w-4 mr-2" />
+                        <category.icon className="h-4 w-4" />
                         {category.name}
                       </Button>
                     ))}
@@ -319,6 +352,8 @@ export default function RentalPage() {
                         item={item}
                         onAddToCart={addToCart}
                         rentalDays={calculateRentalDays()}
+                        startDate={startDate}
+                        endDate={endDate}
                       />
                     ))}
                   </div>
@@ -361,10 +396,14 @@ function EquipmentCard({
   item,
   onAddToCart,
   rentalDays,
+  startDate,
+  endDate,
 }: {
   item: Equipment;
   onAddToCart: (item: Equipment, size?: string) => void;
   rentalDays: number;
+  startDate?: Date;
+  endDate?: Date;
 }) {
   const [selectedSize, setSelectedSize] = useState<string>("");
 
@@ -424,7 +463,7 @@ function EquipmentCard({
             </div>
             <Button
               onClick={() => onAddToCart(item, selectedSize)}
-              disabled={item.sizes && !selectedSize}
+              disabled={(item.sizes && !selectedSize) || !startDate || !endDate}
               className="bg-yellow-400 text-black hover:bg-yellow-500 rounded-2 !flex !w-1/2"
             >
               <Plus className="h-4 w-4" />
@@ -568,7 +607,7 @@ function CartView({
             </div>
             <div className="w-full flex items-center justify-center">
               <Button
-                className={`!w-1/2 text-lg font-bold py-1 rounded-2 !flex justify-center items-center ${
+                className={`!w-1/2 !text-md md:!w-full lg:!w-1/2 md:!text-sm lg:!text-lg font-bold py-1 rounded-2 !flex justify-center items-center ${
                   isLoggedIn
                     ? "bg-yellow-400 text-black hover:bg-yellow-500"
                     : "bg-gray-400 text-gray-600 cursor-not-allowed"
