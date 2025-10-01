@@ -38,7 +38,7 @@ import {
   Package,
   Save,
 } from "lucide-react";
-import {  rentals, skiPasses } from "../Data/mockData";
+import { rentals, skiPasses } from "../Data/mockData";
 import { useUser } from "../store/UseContext";
 import { APP_CONFIG } from "../env";
 import http_api from "../services/http_api";
@@ -70,7 +70,6 @@ export default function DashboardPage() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [bookingData, setBookingData] = useState<BookingDetails[]>([]);
-  var totalMoneyInSeson = 0;
   const months = [
     "січ",
     "лют",
@@ -199,6 +198,7 @@ export default function DashboardPage() {
     ? getRentalDetails(rentalDetailsModal)
     : null;
 
+  //створює pdf для абонементів
   const generatePDF = async (pass: (typeof skiPasses)[0]) => {
     const container = document.createElement("div");
     container.style.width = "500px";
@@ -277,6 +277,33 @@ export default function DashboardPage() {
 
     document.body.removeChild(container);
   };
+
+  //Загальна сума за сезон у вкладці огляд
+  const getTotalMoneyInSeason = (bookingData: BookingDetails[]): number => {
+    const now = new Date();
+    let total = 0;
+
+    bookingData.forEach((booking) => {
+      const checkIn = new Date(booking.checkIn);
+      const checkOut = new Date(booking.checkOut);
+
+      const price =
+        ((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) *
+        booking.room.pricePerNight;
+
+      const isCurrentSeason =
+        checkIn.getMonth() === now.getMonth() &&
+        checkIn.getFullYear() === now.getFullYear();
+
+      if (isCurrentSeason) {
+        total += price;
+      }
+    });
+
+    return total;
+  };
+
+  let totalMoneyInSeson = getTotalMoneyInSeason(bookingData);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -475,7 +502,9 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold mb-2">₴18,200</div>
+                  <div className="text-3xl font-bold mb-2">
+                    ₴{totalMoneyInSeson}
+                  </div>
                   <p className="text-muted-foreground text-sm">
                     У цьому сезоні
                   </p>
@@ -577,10 +606,26 @@ export default function DashboardPage() {
                       <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
                           ₴
-                          {((new Date(booking.checkOut).getTime() -
-                            new Date(booking.checkIn).getTime()) /
-                            (1000 * 60 * 60 * 24)) *
-                            booking.room.pricePerNight}
+                          {(() => {
+                            const checkIn = new Date(booking.checkIn);
+                            const checkOut = new Date(booking.checkOut);
+                            const now = new Date();
+
+                            const price =
+                              ((checkOut.getTime() - checkIn.getTime()) /
+                                (1000 * 60 * 60 * 24)) *
+                              booking.room.pricePerNight;
+
+                            const isCurrentSeason =
+                              checkIn.getMonth() === now.getMonth() &&
+                              checkIn.getFullYear() === now.getFullYear();
+
+                            if (isCurrentSeason) {
+                              totalMoneyInSeson += price;
+                            }
+
+                            return price;
+                          })()}
                         </div>
                         <Button
                           variant="outline"
