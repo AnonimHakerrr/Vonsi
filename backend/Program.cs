@@ -25,6 +25,7 @@ builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<JwtService>();
 builder.Services.AddSingleton<BookingService>();
 builder.Services.AddSingleton<RoomService>();
+builder.Services.AddSingleton<EquipmentService>();
 
 // Auth - JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured."));
