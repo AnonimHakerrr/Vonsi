@@ -56,7 +56,7 @@ namespace backend.Services
                     await photoFile.CopyToAsync(stream);
                 }
 
-                var relativePath = $"/upload/{fileName}";
+                var relativePath = $"upload/{fileName}";
                 updates.Add(Builders<User>.Update.Set(u => u.PhotoUrl, relativePath));
             }
 

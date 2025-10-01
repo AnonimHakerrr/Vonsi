@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,7 @@ builder.Services.Configure<MongoDbSettings>(
 // Реєструємо MongoDbService як Singleton
 builder.Services.AddSingleton<MongoDbService>();
 
- 
+
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
@@ -22,8 +24,10 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<JwtService>();
 builder.Services.AddSingleton<BookingService>();
+builder.Services.AddSingleton<RoomService>();
+
 // Auth - JWT
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]?? throw new InvalidOperationException("JWT Key is not configured."));
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured."));
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -73,14 +77,20 @@ builder.Services.AddCors(options =>
                         .AllowAnyHeader());
 });
 
- 
+
+
 
 var app = builder.Build();
 
 
 app.UseCors("AllowAll");
 
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = ""
+});
 
 if (app.Environment.IsDevelopment())
 {

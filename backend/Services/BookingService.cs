@@ -26,7 +26,6 @@ namespace backend.Services
             _booking = database.GetCollection<Booking>("Booking");
             _mapper = mapper;
 
-            // (опційно) створюємо індекс, щоб швидше шукати бронювання по датах
             var indexKeys = Builders<Booking>.IndexKeys
                 .Ascending(b => b.RoomId)
                 .Ascending(b => b.CheckIn)
@@ -34,20 +33,33 @@ namespace backend.Services
 
             _booking.Indexes.CreateOne(new CreateIndexModel<Booking>(indexKeys));
         }
-        public async Task<Booking?> GetBookingByIdAsync(string id)
+
+
+        public async Task<List<RoomsBookedByUserDto>> GetUserRoomBookingsAsync(string userId)
         {
-            return await _booking.Find(b => b.Id == id).FirstOrDefaultAsync();
+            // 1. Отримуємо бронювання користувача
+            var bookings = await _booking.Find(b => b.UserId == userId).ToListAsync();
+             if (!bookings.Any())
+                return new List<RoomsBookedByUserDto>();
+            var roomIds = bookings.Select(b => b.RoomId).Distinct().ToList();
+
+            // 2. Тягнемо кімнати
+            var roomsCollection = _booking.Database.GetCollection<Room>("Rooms");
+            var rooms = await roomsCollection.Find(r => roomIds.Contains(r.Id)).ToListAsync();
+
+            var roomDict = rooms.ToDictionary(r => r.Id, r => r);
+
+            // 3. Формуємо DTO
+            var result = bookings.Select(b => new RoomsBookedByUserDto
+            {
+                Room = _mapper.Map<RoomDto>(roomDict[b.RoomId]),
+                CheckIn = b.CheckIn,
+                CheckOut = b.CheckOut
+            }).ToList();
+
+            return result;
         }
 
-        public async Task<List<Booking>> GetAllBookingsAsync()
-        {
-            return await _booking.Find(_ => true).ToListAsync();
-        }
-
-        public async Task<List<Booking>> GetUserBookingsAsync(string userId)
-        {
-            return await _booking.Find(b => b.UserId == userId).ToListAsync();
-        }
 
         public async Task<ServiceResult<BookingResponseDto>> CreateBookingAsync(CreateBookingDto dto, string userId)
         {
@@ -71,16 +83,6 @@ namespace backend.Services
             await _booking.InsertOneAsync(booking);
 
             return ServiceResult<BookingResponseDto>.Ok(_mapper.Map<BookingResponseDto>(booking));
-        }
-
-        // Оновлення та видалення теж перевіряють UserId
-        public async Task<ServiceResult<bool>> UpdateBookingAsync(string id, Booking updatedBooking, string userId)
-        {
-            var existing = await _booking.Find(b => b.Id == id && b.UserId == userId).FirstOrDefaultAsync();
-            if (existing == null) return ServiceResult<bool>.Fail("Booking not found.");
-
-            await _booking.ReplaceOneAsync(b => b.Id == id && b.UserId == userId, updatedBooking);
-            return ServiceResult<bool>.Ok(true);
         }
 
         public async Task<ServiceResult<bool>> DeleteBookingAsync(string id, string userId)

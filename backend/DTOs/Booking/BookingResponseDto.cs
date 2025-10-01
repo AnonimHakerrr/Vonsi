@@ -9,6 +9,6 @@ namespace backend.DTOs.Booking
         public DateTime CheckIn { get; set; }
         public DateTime CheckOut { get; set; }
         public string UserId { get; set; } = null!;
-        public string? Notes { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

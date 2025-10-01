@@ -19,27 +19,15 @@ namespace backend.Controllers
             _bookingService = bookingService;
         }
 
-         [HttpGet("getAll")]
+        [HttpGet("getAll")]
         public async Task<IActionResult> GetAllUserBookings()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var bookings = await _bookingService.GetUserBookingsAsync(userId!);
+            var bookings = await _bookingService.GetUserRoomBookingsAsync(userId!);
             return Ok(bookings);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var booking = await _bookingService.GetBookingByIdAsync(id);
-
-            if (booking == null || booking.UserId != userId)
-                return NotFound(new { message = "Booking not found." });
-
-            return Ok(booking);
-        }
-
-        [HttpPost("booking")]
+        [HttpPost("createBooking")]
         public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -48,19 +36,7 @@ namespace backend.Controllers
             if (!result.Success)
                 return BadRequest(new { message = result.Message });
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result.Data);
-        }
-
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] Booking updatedBooking)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await _bookingService.UpdateBookingAsync(id, updatedBooking, userId!);
-
-            if (!result.Success)
-                return NotFound(new { message = result.Message });
-
-            return NoContent();
+            return Ok(result.Data);
         }
 
         [HttpDelete("delete/{id}")]
