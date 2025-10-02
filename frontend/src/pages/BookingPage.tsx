@@ -47,6 +47,8 @@ export default function BookingPage() {
     images: string[];
     amenities: string[];
   };
+  
+
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [guests, setGuests] = useState("2");

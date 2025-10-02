@@ -36,6 +36,15 @@ export function AuthModal({
     agreeToTerms: false,
   });
 
+  const isFormValid =
+    formData.firstName.length >= 3 &&
+    formData.lastName.length >= 3 &&
+    /^\+38\d{10}$/.test(formData.phone) &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+    formData.password.length > 0 &&
+    formData.confirmPassword === formData.password &&
+    formData.agreeToTerms;
+
   useEffect(() => {
     setMode(initialMode);
   }, [initialMode]);
@@ -137,24 +146,50 @@ export function AuthModal({
                   <Input
                     id="firstName"
                     value={formData.firstName}
-                    onChange={(e) =>
-                      handleInputChange("firstName", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      // Валідація: тільки літери, мінімум 2 символи
+                      const regex = /^[a-zA-Zа-яА-ЯіїєґІЇЄҐ'-]{0,}$/;
+
+                      if (regex.test(value)) {
+                        handleInputChange("firstName", value);
+                      }
+                    }}
                     required
                     className="bg-white text-black"
                   />
+                  {formData.firstName.length > 0 &&
+                    formData.firstName.length < 3 && (
+                      <p className="text-red-500 text-xs mt-1">
+                        Ім’я повинно містити мінімум 3 літери
+                      </p>
+                    )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Прізвище</Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
-                    onChange={(e) =>
-                      handleInputChange("lastName", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      // Валідація: тільки літери, апостроф, дефіс
+                      const regex = /^[a-zA-Zа-яА-ЯіїєґІЇЄҐ'-]{0,}$/;
+
+                      if (regex.test(value)) {
+                        handleInputChange("lastName", value);
+                      }
+                    }}
                     required
                     className="bg-white text-black"
                   />
+                  {formData.lastName.length > 0 &&
+                    formData.lastName.length < 3 && (
+                      <p className="text-red-500 text-xs mt-1">
+                        Прізвище повинно містити мінімум 3 літери
+                      </p>
+                    )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -164,7 +199,20 @@ export function AuthModal({
                   type="tel"
                   placeholder="+380 (67) 123-45-67"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  onChange={(e) => {
+                    let value = e.target.value;
+
+                    // Якщо користувач стирає +38, додаємо його назад
+                    if (!value.startsWith("+38")) {
+                      value = "+38" + value.replace(/^\+?38?/, "");
+                    }
+
+                    // Дозволяємо тільки цифри після +38 та максимум 9 цифр
+                    const digits = value.slice(3); // відокремлюємо цифри після +38
+                    if (/^\d*$/.test(digits) && digits.length <= 10) {
+                      handleInputChange("phone", value);
+                    }
+                  }}
                   required
                   className="bg-white text-black"
                 />
@@ -182,6 +230,12 @@ export function AuthModal({
               required
               className="bg-white text-black"
             />
+            {formData.email &&
+              !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
+                <p className="text-red-500 text-sm mt-1">
+                  Невірний формат email
+                </p>
+              )}
           </div>
 
           {/* Пароль */}
@@ -241,10 +295,17 @@ export function AuthModal({
                     )}
                   </button>
                 </div>
+                {formData.confirmPassword &&
+                  formData.confirmPassword !== formData.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Паролі не співпадають
+                    </p>
+                  )}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <Checkbox
+                  className="rounded-1 border border-black bg-yellow-400 text-black checked:bg-yellow-400  checked:!border-yellow-400  checked:!text-black"
                   id="terms"
                   checked={formData.agreeToTerms}
                   onCheckedChange={(checked) =>
@@ -274,7 +335,7 @@ export function AuthModal({
           <Button
             type="submit"
             className="!w-50 !rounded-lg !mx-auto bg-yellow-400 text-black hover:bg-yellow-500"
-            disabled={mode === "register" && !formData.agreeToTerms}
+            disabled={mode === "register" ? !isFormValid : false}
           >
             {mode === "login" ? "Увійти" : "Зареєструватися"}
           </Button>

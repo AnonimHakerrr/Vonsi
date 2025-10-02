@@ -3,41 +3,14 @@ import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/Card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/Card";
 import { Badge } from "../components/Badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/Avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/Tabs";
 import { Input } from "../components/Input";
 import { Label } from "../components/Label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../components/Dialog";
-import {
-  QrCode,
-  Calendar,
-  Settings,
-  LogOut,
-  Download,
-  Eye,
-  Snowflake,
-  CreditCard,
-  Users,
-  MapPin,
-  Clock,
-  Phone,
-  Package,
-  Save,
-} from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../components/Dialog";
+import { QrCode, Calendar, Settings, LogOut, Download, Eye, Snowflake, CreditCard, Users, MapPin, Clock, Phone, Package, Save } from "lucide-react";
 import { rentals, skiPasses } from "../Data/mockData";
 import { useUser } from "../store/UseContext";
 import { APP_CONFIG } from "../env";
@@ -65,6 +38,7 @@ export default function DashboardPage() {
     checkIn: string;
     checkOut: string;
   }
+  
 
   const [activeTab, setActiveTab] = useState("overview");
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -125,7 +99,6 @@ export default function DashboardPage() {
         );
         //console.log(response.data);
         setBookingData(response.data); // записуємо реальні дані
-        console.log(bookingData);
       } catch (error) {
         console.log(error);
       }

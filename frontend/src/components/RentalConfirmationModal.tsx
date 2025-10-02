@@ -8,16 +8,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
 import { CreditCard, Calendar, MapPin } from "lucide-react";
 import { userData } from "../Data/mockData";
 
-interface CartItem {
+interface sizeRental {
+  size: string;
+  quantity: number;
+}
+interface Equipmentt {
   id: string;
-  name: string;
+  type: string;
   brand: string;
-  price: number;
+  rating: number;
+  description: string;
+  pricePerDay: number;
+  availableSizes: sizeRental[];
+  totalQuantityAvailable: number;
+  images: string[];
+}
+interface CartItem extends Equipmentt {
   quantity: number;
   selectedSize?: string;
   rentalDays: number;
-  image: string;
 }
+
 
 interface RentalConfirmationModalProps {
   isOpen: boolean;
@@ -152,13 +163,13 @@ export const RentalConfirmationModal: React.FC<
                   className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted rounded-lg"
                 >
                   <img
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.name}
+                    src={item.images[0] || "/placeholder.svg"}
+                    alt={item.type}
                     className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
                   />
                   <div className="flex-1 w-full sm:w-auto">
                     <div className="font-medium text-sm sm:text-base">
-                      {item.name}
+                      {item.type}
                     </div>
                     <div className="text-xs sm:text-sm text-muted-foreground">
                       {item.brand}{" "}
@@ -169,7 +180,7 @@ export const RentalConfirmationModal: React.FC<
                     <div className="font-medium text-sm sm:text-base">
                       ₴
                       {(
-                        item.price *
+                        item.pricePerDay *
                         item.quantity *
                         item.rentalDays
                       ).toLocaleString()}
@@ -196,12 +207,12 @@ export const RentalConfirmationModal: React.FC<
                     className="font-semibold text-xs sm:text-sm"
                   >
                     {field === "firstName"
-                      ? "Ім'я *"
+                      ? "Ім'я"
                       : field === "lastName"
-                      ? "Прізвище *"
+                      ? "Прізвище"
                       : field === "email"
-                      ? "Email *"
-                      : "Телефон *"}
+                      ? "Email"
+                      : "Телефон"}
                   </Label>
                   <Input
                     id={field}
@@ -211,7 +222,7 @@ export const RentalConfirmationModal: React.FC<
                         : field === "phone"
                         ? "tel"
                         : "text"
-                    }
+                    } 
                     value={customerData[field as keyof typeof customerData]}
                     onChange={(e) => handleInputChange(field, e.target.value)}
                     placeholder={`Введіть ${
@@ -222,6 +233,7 @@ export const RentalConfirmationModal: React.FC<
                         : field
                     }`}
                     required
+                    disabled
                     className="text-xs sm:text-sm"
                   />
                 </div>

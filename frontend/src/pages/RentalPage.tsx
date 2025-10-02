@@ -1,5 +1,5 @@
 // src/pages/RentalPage.tsx
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 import {
@@ -12,7 +12,6 @@ import {
   ShoppingCart,
   LogIn,
 } from "lucide-react";
-import { equipment, type Equipment } from "../Data/mockData";
 import { Button } from "../components/Button";
 import {
   Card,
@@ -35,26 +34,79 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/Tabs";
 import { SidebarMenu } from "../components/SidebarMenu";
 import { RentalConfirmationModal } from "../components/RentalConfirmationModal";
 import { AuthModal } from "../components/AuthModal";
+import http_api from "../services/http_api";
 
-interface CartItem extends Equipment {
+interface CartItem extends Equipmentt {
   quantity: number;
   selectedSize?: string;
   rentalDays: number;
+}
+interface sizeRental {
+  size: string;
+  quantity: number;
+}
+
+interface Equipmentt {
+  id: string;
+  type: string;
+  brand: string;
+  rating: number;
+  description: string;
+  pricePerDay: number;
+  availableSizes: sizeRental[];
+  totalQuantityAvailable: number;
+  images: string[];
 }
 
 export default function RentalPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(
+    new Date(new Date().setDate(new Date().getDate() + 1))
+  );
+
   const [showCart, setShowCart] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [isLoggedIn] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [equipmentList, setEquipmentList] = useState<Equipmentt[]>([]);
+
+  const handleEquipmentSearch = useCallback(async () => {
+    if (!startDate || !endDate) {
+      alert("Будь ласка, виберіть дати оренди");
+      return;
+    }
+
+    try {
+      const response = await http_api.get(
+        "api/Equipment/getAllEquipmentAvailable",
+        {
+          params: {
+            from: format(startDate, "yyyy-MM-dd"),
+            to: format(endDate, "yyyy-MM-dd"),
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setEquipmentList(response.data);
+      } else {
+        throw new Error("Не вдалося отримати доступне обладнання");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Не вдалося отримати доступне обладнання. Спробуйте пізніше.");
+    }
+  }, [startDate, endDate]); // ✅ залежності
+
+  useEffect(() => {
+    handleEquipmentSearch();
+  }, [handleEquipmentSearch]);
 
   const categories = [
     { id: "all", name: "Все обладнання", icon: Snowflake },
-    { id: "skis", name: "Лижі", icon: Snowflake },
+    { id: "ski", name: "Лижі", icon: Snowflake },
     { id: "snowboards", name: "Сноуборди", icon: Snowflake },
     { id: "boots", name: "Черевики", icon: Snowflake },
     { id: "helmets", name: "Шоломи", icon: Snowflake },
@@ -63,8 +115,8 @@ export default function RentalPage() {
 
   const filteredEquipment =
     selectedCategory === "all"
-      ? equipment
-      : equipment.filter((item) => item.category === selectedCategory);
+      ? equipmentList
+      : equipmentList.filter((item) => item.type === selectedCategory);
 
   const calculateRentalDays = () => {
     if (startDate && endDate) {
@@ -74,7 +126,7 @@ export default function RentalPage() {
     return 1;
   };
 
-  const addToCart = (item: Equipment, size?: string) => {
+  const addToCart = (item: Equipmentt, size?: string) => {
     const rentalDays = calculateRentalDays();
     const existingItem = cart.find(
       (cartItem) => cartItem.id === item.id && cartItem.selectedSize === size
@@ -122,7 +174,8 @@ export default function RentalPage() {
 
   const getTotalPrice = () => {
     return cart.reduce(
-      (total, item) => total + item.price * item.quantity * item.rentalDays,
+      (total, item) =>
+        total + item.pricePerDay * item.quantity * item.rentalDays,
       0
     );
   };
@@ -399,8 +452,8 @@ function EquipmentCard({
   startDate,
   endDate,
 }: {
-  item: Equipment;
-  onAddToCart: (item: Equipment, size?: string) => void;
+  item: Equipmentt;
+  onAddToCart: (item: Equipmentt, size?: string) => void;
   rentalDays: number;
   startDate?: Date;
   endDate?: Date;
@@ -412,8 +465,8 @@ function EquipmentCard({
       <CardContent className="p-6">
         <div className="space-y-4">
           <img
-            src={item.image || "/placeholder.svg"}
-            alt={item.name}
+            src={item.images[0] || "/placeholder.svg"}
+            alt={item.type}
             className="w-full h-48 object-cover rounded-lg"
           />
 
@@ -427,13 +480,13 @@ function EquipmentCard({
                 </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg mb-2">{item.name}</h3>
+            <h3 className="font-bold text-lg mb-2">{item.type}</h3>
             <p className="text-sm text-muted-foreground mb-4">
               {item.description}
             </p>
           </div>
 
-          {item.sizes && (
+          {item.availableSizes && (
             <div className="space-y-2">
               <Label className="text-sm font-semibold">Розмір</Label>
               <Select value={selectedSize} onValueChange={setSelectedSize}>
@@ -441,9 +494,9 @@ function EquipmentCard({
                   <SelectValue placeholder="Оберіть розмір" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  {item.sizes.map((size) => (
-                    <SelectItem key={size} value={size}>
-                      {size}
+                  {item.availableSizes.map((size) => (
+                    <SelectItem key={size.size} value={size.size}>
+                      {size.size}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -453,17 +506,19 @@ function EquipmentCard({
 
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-2xl font-bold">₴{item.price}</div>
+              <div className="text-2xl font-bold">₴{item.pricePerDay}</div>
               <div className="text-xs text-muted-foreground">за день</div>
               {rentalDays > 1 && (
                 <div className="text-sm font-medium text-yellow-600">
-                  ₴{item.price * rentalDays} за {rentalDays} дн.
+                  ₴{item.pricePerDay * rentalDays} за {rentalDays} дн.
                 </div>
               )}
             </div>
             <Button
               onClick={() => onAddToCart(item, selectedSize)}
-              disabled={(item.sizes && !selectedSize) || !startDate || !endDate}
+              disabled={
+                (item.availableSizes && !selectedSize) || !startDate || !endDate
+              }
               className="bg-yellow-400 text-black hover:bg-yellow-500 rounded-2 !flex !w-1/2"
             >
               <Plus className="h-4 w-4" />
@@ -473,7 +528,7 @@ function EquipmentCard({
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Info className="h-3 w-3" />
-            <span>В наявності: {item.inStock} шт.</span>
+            <span>В наявності: {item.totalQuantityAvailable} шт.</span>
           </div>
         </div>
       </CardContent>
@@ -519,14 +574,14 @@ function CartView({
           <CardContent className="p-4">
             <div className="space-y-4">
               <img
-                src={item.image || "/placeholder.svg"}
-                alt={item.name}
+                src={item.images[0] || "/placeholder.svg"}
+                alt={item.type}
                 className="w-full h-48 object-cover rounded-lg"
               />
 
               <div className="flex flex-col gap-1">
                 <h3 className="!font-bold text-base sm:text-lg md:text-xl m-0">
-                  {item.name}
+                  {item.type}
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground m-0">
                   {item.brand}
@@ -537,47 +592,64 @@ function CartView({
                   </p>
                 )}
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  ₴{item.price} × {item.rentalDays} дн. × {item.quantity} шт.
+                  ₴{item.pricePerDay} × {item.rentalDays} дн. × {item.quantity}{" "}
+                  шт.
                 </p>
               </div>
 
               <div className="flex justify-center items-center gap-2 mt-2 sm:mt-0">
-                <Button
-                  size="sm"
-                  className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
-                  onClick={() =>
-                    onUpdateQuantity(
-                      item.id,
-                      item.selectedSize,
-                      item.quantity - 1
-                    )
-                  }
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-8 text-center font-semibold">
-                  {item.quantity}
-                </span>
-                <Button
-                  size="sm"
-                  className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
-                  onClick={() =>
-                    onUpdateQuantity(
-                      item.id,
-                      item.selectedSize,
-                      item.quantity + 1
-                    )
-                  }
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                {/** Визначаємо максимальну кількість для обраного розміру */}
+                {(() => {
+                  const maxQuantity = item.selectedSize
+                    ? item.availableSizes.find(
+                        (s) => s.size === item.selectedSize
+                      )?.quantity || item.totalQuantityAvailable
+                    : item.totalQuantityAvailable;
+                  return (
+                    <>
+                      <Button
+                        size="sm"
+                        className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
+                        onClick={() =>
+                          onUpdateQuantity(
+                            item.id,
+                            item.selectedSize,
+                            item.quantity - 1
+                          )
+                        }
+                        disabled={item.quantity <= 1} // мінімум 1
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+
+                      <span className="w-8 text-center font-semibold">
+                        {item.quantity}
+                      </span>
+
+                      <Button
+                        size="sm"
+                        className="!w-1/3 sm:!w-10 md:!w-12 lg:!w-14 !flex justify-center rounded-2 bg-yellow-400 hover:bg-yellow-500 transition-colors"
+                        onClick={() =>
+                          onUpdateQuantity(
+                            item.id,
+                            item.selectedSize,
+                            item.quantity + 1
+                          )
+                        }
+                        disabled={item.quantity >= maxQuantity} // не можна більше, ніж доступно
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </>
+                  );
+                })()}
               </div>
 
               <div className="flex justify-between items-center mt-5">
                 <div className="font-bold text-xl sm:text-2xl md:text-3xl">
                   ₴
                   {(
-                    item.price *
+                    item.pricePerDay *
                     item.quantity *
                     item.rentalDays
                   ).toLocaleString()}
