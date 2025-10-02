@@ -3,6 +3,14 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace backend.Models
 {
+    public class EquipmentsQuantity
+    {
+        [BsonElement("id")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string EquipmentVId { get; set; } = null!;
+        [BsonElement("quantity")]
+        public int Quantity { get; set; }
+    }
     public class EquipmentReservation
     {
         [BsonId]
@@ -10,8 +18,7 @@ namespace backend.Models
         public string? Id { get; set; }
 
         [BsonElement("equipmentVId")]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string? EquipmentVId { get; set; }
+        public List<EquipmentsQuantity>? EquipmentVId { get; set; } = new List<EquipmentsQuantity>();
 
         [BsonElement("userId")]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -22,8 +29,6 @@ namespace backend.Models
 
         [BsonElement("endDate")]
         public DateTime? EndDate { get; set; }
-        [BsonElement("quantity")]
-        public int Quantity { get; set; }
 
         [BsonElement("status")]
         public string Status { get; set; } = "reserved";
