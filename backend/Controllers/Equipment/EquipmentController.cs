@@ -1,10 +1,8 @@
-using AutoMapper;
+using System.Security.Claims;
 using backend.DTOs.EquipmentRental;
-using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace backend.Controllers.EquipmentRental
 {
@@ -30,21 +28,13 @@ namespace backend.Controllers.EquipmentRental
         
         [Authorize]
         [HttpPost("reserveEquipment")]
-        public async Task<IActionResult> ReserveEquipment([FromBody] EquipmentReservationDto reservationDto)
+        public async Task<IActionResult> ReserveEquipment([FromBody] EquipmentReservationDto dto)
         {
-            // var result = await _equipmentService.ReserveEquipmentAsync(reservationDto);
-            return Ok("Equipment reserved successfully");
+             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _equipmentService.CreateEquipmentReservationAsync(dto, userId);
+                if (!result.Success)
+                    return BadRequest(new { message = result.Message });
+            return Ok(result.Data);
         }
-
-        // [HttpGet("{id}")]
-        // public async Task<IActionResult> GetEquipmentById(string id)
-        // {
-        //     var equipment = await _equipmentService.GetEquipmentByIdAsync(id);
-        //     if (equipment == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return Ok(equipment);
-        // }
     }
 }

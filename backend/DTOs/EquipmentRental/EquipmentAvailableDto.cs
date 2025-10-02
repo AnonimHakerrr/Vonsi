@@ -1,7 +1,8 @@
 namespace backend.DTOs.EquipmentRental
-{   
-     public class SizeQuantity
+{
+    public class SizeQuantity
     {
+        public string? EquipmentVId { get; set; } = null!;
         public string Size { get; set; } = null!;
         public int Quantity { get; set; }
     }

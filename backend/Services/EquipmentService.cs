@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.Config;
 using backend.DTOs.EquipmentRental;
+using backend.DTOs.Services;
 using backend.Models;
 using MongoDB.Driver;
 
@@ -41,7 +42,7 @@ namespace backend.Services
             foreach (var eq in equipments)
             {
                 var dto = _mapper.Map<EquipmentAvailableDto>(eq);
-                
+
                 // Отримуємо всі варіанти (розміри) для цього обладнання
                 var variants = await _variants
                     .Find(v => v.EquipmentId == eq.Id)
@@ -54,13 +55,13 @@ namespace backend.Services
                 {
                     // Підраховуємо скільки цього варіанту вже заброньовано
                     int reservedQty = 0;
-                    
+
                     foreach (var reservation in overlappingReservations)
                     {
                         // Шукаємо цей варіант в масиві equipmentVId резервації
                         var reservedItem = reservation.EquipmentVId?
                             .FirstOrDefault(item => item.EquipmentVId == variant.Id);
-                        
+
                         if (reservedItem != null)
                         {
                             reservedQty += reservedItem.Quantity;
@@ -75,6 +76,7 @@ namespace backend.Services
                     {
                         availableSizes.Add(new SizeQuantity
                         {
+                            EquipmentVId = variant.Id,
                             Size = variant.Size,
                             Quantity = available
                         });
@@ -93,5 +95,85 @@ namespace backend.Services
 
             return result;
         }
+
+        public async Task<ServiceResult<EquipmentReservationDto>> CreateEquipmentReservationAsync(EquipmentReservationDto dto, string userId)
+        {
+            if (dto.CheckIn >= dto.CheckOut)
+                return ServiceResult<EquipmentReservationDto>.Fail("Check-in date must be earlier than check-out date.");
+
+            if (dto.EquipmentVariants == null || !dto.EquipmentVariants.Any())
+                return ServiceResult<EquipmentReservationDto>.Fail("EquipmentVariants cannot be empty.");
+
+            // Отримуємо всі резервації, які перетинаються з заданим періодом
+            var overlappingReservations = await _reservations
+                .Find(r => r.Status == "reserved" &&
+                           r.StartDate < dto.CheckOut &&
+                           r.EndDate > dto.CheckIn)
+                .ToListAsync();
+
+            // Перевіряємо кожний обраний варіант обладнання
+            foreach (var eqVariant in dto.EquipmentVariants)
+            {
+                int reservedQty = overlappingReservations
+                    .SelectMany(r => r.EquipmentVId)
+                    .Where(v => v.EquipmentVId == eqVariant.EquipmentVId)
+                    .Sum(v => v.Quantity);
+
+                var variant = await _variants
+                    .Find(v => v.Id == eqVariant.EquipmentVId)
+                    .FirstOrDefaultAsync();
+
+                if (variant == null)
+                    return ServiceResult<EquipmentReservationDto>.Fail($"Variant {eqVariant.EquipmentVId} not found.");
+
+                if (reservedQty + eqVariant.Quantity > variant.Quantity)
+                    return ServiceResult<EquipmentReservationDto>.Fail($"Not enough equipment for variant {variant.Id}.");
+            }
+
+            // Шукаємо чи є вже резервація користувача на ці дати
+            var checkIn = dto.CheckIn.Date;
+            var checkOut = dto.CheckOut.Date;
+
+            var existingReservation = await _reservations
+                .Find(r => r.UserId == userId &&
+                           r.Status == "reserved" &&
+                           r.StartDate.Date == checkIn &&
+                           r.EndDate.Date == checkOut)
+                .FirstOrDefaultAsync();
+
+
+            if (existingReservation != null)
+            {
+                // додаємо обладнання до існуючої резервації
+                foreach (var eqVariant in dto.EquipmentVariants)
+                {
+                    var existingEq = existingReservation.EquipmentVId
+                        .FirstOrDefault(v => v.EquipmentVId == eqVariant.EquipmentVId);
+
+                    if (existingEq != null)
+                    {
+                        existingEq.Quantity += eqVariant.Quantity;
+                    }
+                    else
+                    {
+                        existingReservation.EquipmentVId.Add(_mapper.Map<backend.Models.EquipmentsQuantity>(eqVariant));
+                    }
+                }
+
+                await _reservations.ReplaceOneAsync(r => r.Id == existingReservation.Id, existingReservation);
+            }
+            else
+            {
+                // створюємо нову резервацію
+                var reservation = _mapper.Map<EquipmentReservation>(dto);
+                reservation.UserId = userId;
+                await _reservations.InsertOneAsync(reservation);
+            }
+
+            return ServiceResult<EquipmentReservationDto>.Ok(dto);
+        }
+
+
+
     }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.DTOs.EquipmentRental;
 using backend.Models;
+using EquipmentsQuantity = backend.Models.EquipmentsQuantity;
 
 namespace backend.Helpers
 {
@@ -18,6 +19,22 @@ namespace backend.Helpers
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.AvailableSizes, opt => opt.Ignore())   // ми підраховуємо в сервісі
                 .ForMember(dest => dest.TotalQuantityAvailable, opt => opt.Ignore()); // теж підрахунок у сервісі
+
+           
+            // Мапінг DTO -> Model для EquipmentsQuantity
+            CreateMap<DTOs.EquipmentRental.EquipmentsQuantity, Models.EquipmentsQuantity>()
+                .ForMember(dest => dest.EquipmentVId, opt => opt.MapFrom(src => src.EquipmentVId))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
+
+            // Мапінг для створення резервації
+            CreateMap<EquipmentReservationDto, EquipmentReservation>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore()) // встановлюємо в сервісі
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.CheckIn))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.CheckOut))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "reserved"))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.EquipmentVId, opt => opt.MapFrom(src => src.EquipmentVariants));
         }
     }
 }

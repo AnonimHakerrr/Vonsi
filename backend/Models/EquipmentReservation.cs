@@ -28,7 +28,7 @@ namespace backend.Models
         public DateTime StartDate { get; set; }
 
         [BsonElement("endDate")]
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         [BsonElement("status")]
         public string Status { get; set; } = "reserved";
