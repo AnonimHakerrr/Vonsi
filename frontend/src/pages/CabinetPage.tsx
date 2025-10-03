@@ -3,15 +3,42 @@ import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/Card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/Card";
 import { Badge } from "../components/Badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/Avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/Tabs";
 import { Input } from "../components/Input";
 import { Label } from "../components/Label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../components/Dialog";
-import { QrCode, Calendar, Settings, LogOut, Download, Eye, Snowflake, CreditCard, Users, MapPin, Clock, Phone, Package, Save } from "lucide-react";
-import { rentals, skiPasses } from "../Data/mockData";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../components/Dialog";
+import {
+  QrCode,
+  Calendar,
+  Settings,
+  LogOut,
+  Download,
+  Eye,
+  Snowflake,
+  CreditCard,
+  Users,
+  MapPin,
+  Clock,
+  Phone,
+  Package,
+  Save,
+} from "lucide-react";
+import { skiPasses } from "../Data/mockData";
 import { useUser } from "../store/UseContext";
 import { APP_CONFIG } from "../env";
 import http_api from "../services/http_api";
@@ -38,12 +65,23 @@ export default function DashboardPage() {
     checkIn: string;
     checkOut: string;
   }
-  
+
+  interface EquipmentRental {
+    type: string;
+    brand: string;
+    description: string;
+    pricePerDay: number;
+    size: string;
+    quantity: number;
+    checkIn: string; // ISO дата у форматі рядка
+    checkOut: string; // ISO дата у форматі рядка
+  }
 
   const [activeTab, setActiveTab] = useState("overview");
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [bookingData, setBookingData] = useState<BookingDetails[]>([]);
+  const [rentalData, setRentalData] = useState<EquipmentRental[]>([]);
   const months = [
     "січ",
     "лют",
@@ -84,6 +122,7 @@ export default function DashboardPage() {
     email: false,
     phone: false,
   });
+
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -107,12 +146,36 @@ export default function DashboardPage() {
     fetchBookings(); // викликаємо async функцію
   }, []);
 
+  useEffect(() => {
+    const fetchRentals = async () => {
+      try {
+        const token = getToken();
+        const response = await http_api.get<EquipmentRental[]>(
+          "api/Equipment/getUserReservations", // заміни на свій endpoint
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setRentalData(response.data);
+        console.log("response.data", response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchRentals();
+  }, []);
+
   const [bookingDetailsModal, setBookingDetailsModal] =
     useState<BookingDetails | null>(null);
 
-  const [rentalDetailsModal, setRentalDetailsModal] = useState<string | null>(
-    null
-  );
+  const [rentalDetailsModal, setRentalDetailsModal] =
+    useState<EquipmentRental | null>(null);
+
   const navigate = useNavigate();
 
   const handleGoHome = () => {
@@ -166,10 +229,7 @@ export default function DashboardPage() {
     }
   };
 
-  const getRentalDetails = (id: string) => rentals.find((r) => r.id === id);
-  const rental = rentalDetailsModal
-    ? getRentalDetails(rentalDetailsModal)
-    : null;
+  const rental = rentalDetailsModal;
 
   //створює pdf для абонементів
   const generatePDF = async (pass: (typeof skiPasses)[0]) => {
@@ -476,7 +536,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold mb-2">
-                    ₴{totalMoneyInSeson}
+                    ₴{totalMoneyInSeson.toLocaleString("uk-UA")}
                   </div>
                   <p className="text-muted-foreground text-sm">
                     У цьому сезоні
@@ -539,8 +599,8 @@ export default function DashboardPage() {
 
             {/* Список бронювань */}
             <div className="space-y-4">
-              {bookingData.map((booking) => (
-                <Card key={booking.room.id}>
+              {bookingData.map((booking, index) => (
+                <Card key={index}>
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       {/* Ліва частина */}
@@ -584,11 +644,13 @@ export default function DashboardPage() {
                             const checkOut = new Date(booking.checkOut);
                             const now = new Date();
 
+                            // Розрахунок ціни
                             const price =
                               ((checkOut.getTime() - checkIn.getTime()) /
                                 (1000 * 60 * 60 * 24)) *
                               booking.room.pricePerNight;
 
+                            // Перевірка сезону
                             const isCurrentSeason =
                               checkIn.getMonth() === now.getMonth() &&
                               checkIn.getFullYear() === now.getFullYear();
@@ -598,7 +660,7 @@ export default function DashboardPage() {
                             }
 
                             return price;
-                          })()}
+                          })()?.toLocaleString("uk-UA")}
                         </div>
                         <Button
                           variant="outline"
@@ -632,8 +694,8 @@ export default function DashboardPage() {
 
             {/* Список оренд */}
             <div className="space-y-4">
-              {rentals.map((rental) => (
-                <Card key={rental.id}>
+              {rentalData.map((rental, index) => (
+                <Card key={index}>
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       {/* Ліва частина */}
@@ -641,35 +703,62 @@ export default function DashboardPage() {
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge
                             className={
-                              rental.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-blue-100 text-blue-800"
+                              // Парсимо ISO дати і залишаємо тільки день, місяць, рік
+                              new Date(rental.checkOut).setHours(0, 0, 0, 0) >=
+                              new Date().setHours(0, 0, 0, 0)
+                                ? "bg-green-100 text-green-800" // ще активна оренда
+                                : "bg-blue-100 text-blue-800" // оренда вже закінчилася
                             }
                           >
-                            {rental.status === "active"
+                            {new Date(rental.checkOut).setHours(0, 0, 0, 0) >=
+                            new Date().setHours(0, 0, 0, 0)
                               ? "Активна оренда"
-                              : "Майбутня оренда"}
+                              : "Минула оренда"}
                           </Badge>
                         </div>
                         <h3 className="text-lg font-semibold mb-1">
-                          {rental.item}
+                          {rental.type}
                         </h3>
                         <div className="flex items-center gap-1 text-muted-foreground text-sm">
                           <Calendar className="h-4 w-4" />
-                          {rental.dates}
+                          {`${new Date(rental.checkIn).getDate()}-${new Date(
+                            rental.checkOut
+                          ).getDate()} ${
+                            months[new Date(rental.checkIn).getMonth()]
+                          }`}
                         </div>
                       </div>
 
                       {/* Права частина */}
                       <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
-                          {rental.price}
+                          ₴{" "}
+                          {(() => {
+                            const checkInDate = new Date(rental.checkIn);
+                            const checkOutDate = new Date(rental.checkOut);
+
+                            // Обнуляємо час, залишаємо тільки день
+                            checkInDate.setHours(0, 0, 0, 0);
+                            checkOutDate.setHours(0, 0, 0, 0);
+
+                            // Різниця у мілісекундах
+                            const diffTime =
+                              checkOutDate.getTime() - checkInDate.getTime();
+
+                            // Кількість ночей
+                            const nights = Math.ceil(
+                              diffTime / (1000 * 60 * 60 * 24)
+                            );
+
+                            // Загальна сума
+                            return rental.pricePerDay * nights;
+                          })()}
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
                           className="!flex !items-center !justify-center !rounded-lg"
-                          onClick={() => setRentalDetailsModal(rental.id)}
+                          onClick={() => setRentalDetailsModal(rental)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Деталі
@@ -874,17 +963,25 @@ export default function DashboardPage() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">За ніч:</span>
-                          <span>{bookingDetailsModal.room.pricePerNight}</span>
+                          <span>
+                            {bookingDetailsModal.room.pricePerNight.toLocaleString(
+                              "uk-UA"
+                            )}
+                          </span>
                         </div>
                         <div className="flex justify-between font-semibold">
                           <span>Загалом:</span>
                           <span>
-                            {((new Date(
-                              bookingDetailsModal.checkOut
-                            ).getTime() -
-                              new Date(bookingDetailsModal.checkIn).getTime()) /
-                              (1000 * 60 * 60 * 24)) *
-                              bookingDetailsModal.room.pricePerNight}
+                            {(
+                              ((new Date(
+                                bookingDetailsModal.checkOut
+                              ).getTime() -
+                                new Date(
+                                  bookingDetailsModal.checkIn
+                                ).getTime()) /
+                                (1000 * 60 * 60 * 24)) *
+                              bookingDetailsModal.room.pricePerNight
+                            ).toLocaleString("uk-UA")}
                           </span>
                         </div>
                       </div>
@@ -899,62 +996,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
               }
-
-              {/* Абонемент
-              {booking.type === "Абонемент" && booking.details && (
-                <div className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Тип абонементу:
-                        </span>
-                        <span>{booking.details.passType}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Дійсний з:
-                        </span>
-                        <span>{booking.details.validFrom}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Дійсний до:
-                        </span>
-                        <span>{booking.details.validTo}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">QR-код:</span>
-                        <span className="font-mono">
-                          {booking.details.qrCode}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Схили:</span>
-                        <span>{booking.details.slopes}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Підйомники:
-                        </span>
-                        <span>{booking.details.lifts}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Обмеження:
-                        </span>
-                        <span>{booking.details.restrictions}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Контакт:</span>
-                        <span>{booking.details.contact}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )} */}
             </div>
           ) : (
             <p>Немає деталей для цього бронювання.</p>
@@ -977,15 +1018,17 @@ export default function DashboardPage() {
           {rental ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl !font-bold">{rental.item}</h3>
+                <h3 className="text-xl !font-bold">{rental.type}</h3>
                 <Badge
                   className={
-                    rental.status === "active"
+                    new Date(rental.checkOut).setHours(0, 0, 0, 0) >=
+                    new Date().setHours(0, 0, 0, 0)
                       ? "bg-green-100 text-green-800"
                       : "bg-blue-100 text-blue-800"
                   }
                 >
-                  {rental.status === "active"
+                  {new Date(rental.checkOut).setHours(0, 0, 0, 0) >=
+                  new Date().setHours(0, 0, 0, 0)
                     ? "Активна оренда"
                     : "Майбутня оренда"}
                 </Badge>
@@ -1002,18 +1045,16 @@ export default function DashboardPage() {
                       <div className="">
                         <span className="text-muted-foreground">Назва: </span>
                         <span className="break-words">
-                          {rental.details.equipment}
+                          {rental.type + " " + rental.brand}
                         </span>
                       </div>
                       <div className="">
                         <span className="text-muted-foreground">Розмір: </span>
-                        <span className="break-words">
-                          {rental.details.size}
-                        </span>
+                        <span className="break-words">{rental.size}</span>
                       </div>
                       <div className="">
                         <span className="text-muted-foreground">Стан: </span>
-                        <span>{rental.details.condition}</span>
+                        <span>Відмінний</span>
                       </div>
                     </div>
                   </div>
@@ -1027,13 +1068,33 @@ export default function DashboardPage() {
                       <div className="">
                         <span className="text-muted-foreground">Оренда: </span>
                         <span className="break-words font-black">
-                          {rental.price}
+                          ₴{" "}
+                          {(() => {
+                            const checkInDate = new Date(rental.checkIn);
+                            const checkOutDate = new Date(rental.checkOut);
+
+                            // Обнуляємо час, залишаємо тільки день
+                            checkInDate.setHours(0, 0, 0, 0);
+                            checkOutDate.setHours(0, 0, 0, 0);
+
+                            // Різниця у мілісекундах
+                            const diffTime =
+                              checkOutDate.getTime() - checkInDate.getTime();
+
+                            // Кількість ночей
+                            const nights = Math.ceil(
+                              diffTime / (1000 * 60 * 60 * 24)
+                            );
+
+                            // Загальна сума
+                            return rental.pricePerDay * nights;
+                          })()}
                         </span>
                       </div>
                       <div className="">
                         <span className="text-muted-foreground">Застава: </span>
                         <span className="break-words">
-                          {rental.details.deposit}
+                          ₴2,000 (повернеться після здачі)
                         </span>
                       </div>
                     </div>
@@ -1051,7 +1112,7 @@ export default function DashboardPage() {
                       <div className="">
                         <span className="text-muted-foreground">Видача: </span>
                         <span className="break-words">
-                          {rental.details.pickupLocation}
+                          Пункт оренди (1-й поверх готелю)
                         </span>
                       </div>
                       <div className="">
@@ -1059,7 +1120,7 @@ export default function DashboardPage() {
                           Повернення:{" "}
                         </span>
                         <span className="break-wordst">
-                          {rental.details.returnLocation}
+                          Пункт оренди (1-й поверх готелю)
                         </span>
                       </div>
                     </div>
@@ -1074,7 +1135,17 @@ export default function DashboardPage() {
                       <div className="">
                         <span className="text-muted-foreground">Видача: </span>
                         <span className="break-words">
-                          {rental.details.pickupTime}
+                          {(() => {
+                            const date = new Date(rental.checkIn);
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0"
+                            ); // місяці від 0
+                            const day = String(date.getDate()).padStart(2, "0");
+
+                            return `${year}-${month}-${day}`;
+                          })()}
                         </span>
                       </div>
                       <div className="">
@@ -1082,7 +1153,17 @@ export default function DashboardPage() {
                           Повернення:{" "}
                         </span>
                         <span className="break-words">
-                          {rental.details.returnTime}
+                          {(() => {
+                            const date = new Date(rental.checkOut);
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0"
+                            ); // місяці від 0
+                            const day = String(date.getDate()).padStart(2, "0");
+
+                            return `${year}-${month}-${day}`;
+                          })()}
                         </span>
                       </div>
                     </div>
@@ -1092,7 +1173,7 @@ export default function DashboardPage() {
                     <h5 className="font-semibold mb-2 flex items-center gap-2">
                       <Phone className="h-5 w-5 text-yellow-400" /> Контакти
                     </h5>
-                    <p className="text-sm">{rental.details.contact}</p>
+                    <p className="text-sm">+380 (44) 123-45-68</p>
                   </div>
                 </div>
               </div>

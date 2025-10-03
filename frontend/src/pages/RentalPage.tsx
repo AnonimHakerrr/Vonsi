@@ -42,6 +42,7 @@ interface CartItem extends Equipmentt {
   rentalDays: number;
 }
 interface sizeRental {
+  equipmentVId?: string;
   size: string;
   quantity: number;
 }
@@ -73,7 +74,7 @@ export default function RentalPage() {
   const [equipmentList, setEquipmentList] = useState<Equipmentt[]>([]);
 
   const handleEquipmentSearch = useCallback(async () => {
-    if (!startDate || !endDate) {
+    if (!startDate || !endDate || startDate === endDate) {
       alert("Будь ласка, виберіть дати оренди");
       return;
     }
@@ -103,6 +104,10 @@ export default function RentalPage() {
   useEffect(() => {
     handleEquipmentSearch();
   }, [handleEquipmentSearch]);
+  useEffect(() => {
+    // Очищаємо кошик при зміні дат
+    setCart([]);
+  }, [startDate, endDate]);
 
   const categories = [
     { id: "all", name: "Все обладнання", icon: Snowflake },
@@ -128,14 +133,20 @@ export default function RentalPage() {
 
   const addToCart = (item: Equipmentt, size?: string) => {
     const rentalDays = calculateRentalDays();
+
+    
+
     const existingItem = cart.find(
-      (cartItem) => cartItem.id === item.id && cartItem.selectedSize === size
+      (cartItem) =>
+        cartItem.id === item.id &&
+        cartItem.selectedSize === size
     );
 
     if (existingItem) {
       setCart(
         cart.map((cartItem) =>
-          cartItem.id === item.id && cartItem.selectedSize === size
+          cartItem.id === item.id &&
+          cartItem.selectedSize === size 
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
         )
@@ -143,7 +154,12 @@ export default function RentalPage() {
     } else {
       setCart([
         ...cart,
-        { ...item, quantity: 1, selectedSize: size, rentalDays },
+        {
+          ...item,
+          quantity: 1,
+          selectedSize: size,
+          rentalDays,
+        },
       ]);
     }
   };
@@ -269,23 +285,39 @@ export default function RentalPage() {
                           onSelectDate={(date) => {
                             if (!date) return;
 
-                            // Забороняємо однакові дати
-                            if (endDate && date >= endDate) {
-                              setStartDate(
-                                new Date(
-                                  endDate.getTime() - 24 * 60 * 60 * 1000
-                                )
-                              ); // день до endDate
-                            } else {
-                              setStartDate(date);
+                            // Обнуляємо час для порівняння
+                            const selectedDate = new Date(date);
+                            selectedDate.setHours(0, 0, 0, 0);
+
+                            if (endDate) {
+                              const end = new Date(endDate);
+                              end.setHours(0, 0, 0, 0);
+
+                              // Забороняємо однакові дати або більші
+                              if (selectedDate >= end) {
+                                const newStart = new Date(
+                                  end.getTime() - 24 * 60 * 60 * 1000
+                                ); // день перед endDate
+                                setStartDate(newStart);
+                                return;
+                              }
                             }
+
+                            setStartDate(selectedDate);
                           }}
                           disabled={(date) => {
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
-                            // Забороняємо дати в минулому і однакові з endDate
+
+                            const d = new Date(date);
+                            d.setHours(0, 0, 0, 0);
+
+                            // Забороняємо дати в минулому і >= endDate
                             return (
-                              date < today || (endDate ? date > endDate : false)
+                              d < today ||
+                              (endDate
+                                ? d >= new Date(endDate.setHours(0, 0, 0, 0))
+                                : false)
                             );
                           }}
                         />
@@ -314,24 +346,39 @@ export default function RentalPage() {
                           onSelectDate={(date) => {
                             if (!date) return;
 
-                            // Забороняємо однакові дати
-                            if (startDate && date <= startDate) {
-                              setEndDate(
-                                new Date(
-                                  startDate.getTime() + 24 * 60 * 60 * 1000
-                                )
-                              ); // день після startDate
-                            } else {
-                              setEndDate(date);
+                            // Обнуляємо час для порівняння
+                            const selectedDate = new Date(date);
+                            selectedDate.setHours(0, 0, 0, 0);
+
+                            if (startDate) {
+                              const start = new Date(startDate);
+                              start.setHours(0, 0, 0, 0);
+
+                              // Забороняємо однакові дати або менші
+                              if (selectedDate <= start) {
+                                const newEnd = new Date(
+                                  start.getTime() + 24 * 60 * 60 * 1000
+                                ); // день після startDate
+                                setEndDate(newEnd);
+                                return;
+                              }
                             }
+
+                            setEndDate(selectedDate);
                           }}
                           disabled={(date) => {
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
-                            // Забороняємо дати в минулому і однакові з startDate
+
+                            const d = new Date(date);
+                            d.setHours(0, 0, 0, 0);
+
+                            // Забороняємо дати в минулому і <= startDate
                             return (
-                              date < today ||
-                              (startDate ? date <= startDate : false)
+                              d < today ||
+                              (startDate
+                                ? d <= new Date(startDate.setHours(0, 0, 0, 0))
+                                : false)
                             );
                           }}
                         />

@@ -1,7 +1,7 @@
-import HomePage from "../src/pages/Homepage"; 
+import HomePage from "./pages/HomePage/Homepage"; 
 import CabinetPage from "./pages/CabinetPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
-import BookingPage from "./pages/BookingPage";
+import BookingPage from "./pages/BookingPage/BookingPage";
 import RentalPage from "./pages/RentalPage";
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfUse } from './pages/TermsOfUse'

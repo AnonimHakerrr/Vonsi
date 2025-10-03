@@ -7,8 +7,12 @@ import { Textarea } from "./TextArea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
 import { CreditCard, Calendar, MapPin } from "lucide-react";
 import { userData } from "../Data/mockData";
+import http_api from "../services/http_api";
+import { getToken } from "../services/tokenService";
+import { useNavigate } from "react-router-dom";
 
 interface sizeRental {
+  equipmentVId?: string;
   size: string;
   quantity: number;
 }
@@ -28,7 +32,6 @@ interface CartItem extends Equipmentt {
   selectedSize?: string;
   rentalDays: number;
 }
-
 
 interface RentalConfirmationModalProps {
   isOpen: boolean;
@@ -51,22 +54,64 @@ export const RentalConfirmationModal: React.FC<
   });
 
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const navigate = useNavigate();
+
 
   const handleInputChange = (field: string, value: string) => {
     setCustomerData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleConfirmRental = () => {
-    console.log("Rental confirmed:", {
-      customer: customerData,
-      cart,
-      totalPrice,
-      startDate,
-      endDate,
-      paymentMethod,
+  const handleConfirmRental = async () => {
+    if (!startDate || !endDate || cart.length === 0) {
+      alert("Будь ласка, оберіть дати та обладнання для оренди.");
+      return;
+    }
+    const token = getToken();
+    // Формуємо масив equipmentVariants
+    const equipmentVariants = cart.map((item) => {
+      // Знаходимо об'єкт sizeRental, який відповідає вибраному розміру користувача
+      const selectedSizeObj = item.availableSizes.find((s) => {
+        return s.size === item.selectedSize;
+      });
+      const equipmentVId = selectedSizeObj?.equipmentVId
+        ? String(selectedSizeObj.equipmentVId)
+        : "";
+      console.log("equipmentVId", equipmentVId);
+      return {
+        equipmentVId,
+        quantity: item.quantity,
+      };
     });
 
-    alert("Оренда успішно оформлена! Ви отримаєте підтвердження на email.");
+    const payload = {
+      equipmentVariants,
+      checkIn: startDate.toISOString(),
+      checkOut: endDate.toISOString(),
+    };
+
+    try {
+      const response = await http_api.post(
+        "api/Equipment/reserveEquipment", // змінити на свій endpoint
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("Оренда успішно оформлена! Ви отримаєте підтвердження на email.");
+        navigate("/dashboard"); 
+        onClose();
+      } else {
+        throw new Error("Не вдалося створити бронювання обладнання");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Не вдалося створити бронювання. Спробуйте пізніше.");
+    }
     onClose();
   };
 
@@ -222,7 +267,7 @@ export const RentalConfirmationModal: React.FC<
                         : field === "phone"
                         ? "tel"
                         : "text"
-                    } 
+                    }
                     value={customerData[field as keyof typeof customerData]}
                     onChange={(e) => handleInputChange(field, e.target.value)}
                     placeholder={`Введіть ${
