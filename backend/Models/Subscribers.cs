@@ -29,6 +29,6 @@ namespace backend.Models
         public string Status { get; set; } = "active";
 
         [BsonElement("createdAt")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

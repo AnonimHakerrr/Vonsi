@@ -1,3 +1,5 @@
+using System;
+
 namespace backend.DTOs.Subscriptions
 {
     public class SubscriptionDto

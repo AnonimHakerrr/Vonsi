@@ -1,11 +1,11 @@
+using System;
+
 namespace backend.DTOs.Subscribers
 {
-    public class SubscriberDto
+    public class SubscribersDto
     {
-        public string? Id { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string Phone { get; set; } = null!;
+        public string SubscriptionId { get; set; } = null!;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

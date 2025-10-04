@@ -18,7 +18,7 @@ namespace backend.Controllers
         }
 
         // Повертає всі абонементи
-        [HttpGet("all")]
+        [HttpGet("allSubscription")]
         [SwaggerOperation(Summary = "Повертає всі абонементи")]
         public async Task<IActionResult> GetAllSubscriptions()
         {
