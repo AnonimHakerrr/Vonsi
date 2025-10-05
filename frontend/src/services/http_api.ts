@@ -24,7 +24,7 @@ http_api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       removeToken(); // видаляємо токен при неавторизованому доступі
-      window.location.href = '/auth/signin';
+      error.isAuthError = true;
     }
     return Promise.reject(error);
   }

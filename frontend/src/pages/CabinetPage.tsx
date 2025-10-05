@@ -97,16 +97,7 @@ export default function DashboardPage() {
     "груд",
   ];
 
-  const { user, signOut } = useUser();
-  const [userData, setUserData] = useState<IUser>({
-    userId: user?.userId || "",
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    photoUrl: user?.photoUrl || "images.jpg",
-  });
-
+  const { user, signOut } = useUser(); 
   const [editableUserData, setEditableUserData] = useState<IUser>({
     userId: user?.userId || "",
     firstName: user?.firstName || "",
@@ -115,6 +106,19 @@ export default function DashboardPage() {
     phone: user?.phone || "",
     photoUrl: user?.photoUrl || "images.jpg",
   });
+  useEffect(() => {
+  if (settingsModalOpen && user) {
+    setEditableUserData({
+      userId: user.userId || "",
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      photoUrl: user.photoUrl || "images.jpg",
+    });
+  }
+}, [settingsModalOpen, user]);
+
 
   const [fieldErrors, setFieldErrors] = useState({
     firstName: false,
@@ -151,7 +155,7 @@ export default function DashboardPage() {
       try {
         const token = getToken();
         const response = await http_api.get<EquipmentRental[]>(
-          "api/Equipment/getUserReservations", // заміни на свій endpoint
+          "api/Equipment/getUserReservations",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -212,10 +216,9 @@ export default function DashboardPage() {
         },
       });
 
-      console.log(userData);
 
       // 1. Оновлюємо стан локального користувача
-      setUserData(res.data); // setUserData — це твій стан користувача, який рендерить сторінку
+      setEditableUserData(res.data); 
 
       // 2. Закриваємо модалку
       setSettingsModalOpen(false);
@@ -312,9 +315,45 @@ export default function DashboardPage() {
   };
 
   //Загальна сума за сезон у вкладці огляд
-  const getTotalMoneyInSeason = (bookingData: BookingDetails[]): number => {
+  const getTotalMoneyInSeason = (
+    bookingData: BookingDetails[],
+    rentalData: EquipmentRental[]
+  ): number => {
     const now = new Date();
     let total = 0;
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    // Перевірка поточного сезону (3 місяці від сьогодні)
+    const seasonMonths = [
+      currentMonth,
+      (currentMonth + 1) % 12,
+      (currentMonth + 2) % 12,
+    ];
+
+    rentalData.forEach((rental) => {
+      const checkIn = new Date(rental.checkIn);
+      const checkOut = new Date(rental.checkOut);
+
+      // Обнуляємо час, залишаємо тільки день
+      checkIn.setHours(0, 0, 0, 0);
+      checkOut.setHours(0, 0, 0, 0);
+
+      // Кількість ночей
+      const nights = Math.ceil(
+        (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      // Вартість за оренду
+      const price = rental.pricePerDay * nights;
+
+      const isCurrentSeason =
+        seasonMonths.includes(checkIn.getMonth()) &&
+        checkIn.getFullYear() === currentYear;
+
+      if (isCurrentSeason) {
+        total += price;
+      }
+    });
 
     bookingData.forEach((booking) => {
       const checkIn = new Date(booking.checkIn);
@@ -325,18 +364,16 @@ export default function DashboardPage() {
         booking.room.pricePerNight;
 
       const isCurrentSeason =
-        checkIn.getMonth() === now.getMonth() &&
-        checkIn.getFullYear() === now.getFullYear();
-
+        seasonMonths.includes(checkIn.getMonth()) &&
+        checkIn.getFullYear() === currentYear;
       if (isCurrentSeason) {
         total += price;
       }
     });
-
     return total;
   };
 
-  let totalMoneyInSeson = getTotalMoneyInSeason(bookingData);
+  let totalMoneyInSeson = getTotalMoneyInSeason(bookingData, rentalData);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -732,7 +769,7 @@ export default function DashboardPage() {
                       {/* Права частина */}
                       <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
-                          ₴{" "}
+                          ₴
                           {(() => {
                             const checkInDate = new Date(rental.checkIn);
                             const checkOutDate = new Date(rental.checkOut);
@@ -751,7 +788,12 @@ export default function DashboardPage() {
                             );
 
                             // Загальна сума
-                            return rental.pricePerDay * nights;
+                            const total = rental.pricePerDay * nights;
+
+                            // Форматуємо з пробілом тисяч
+                            return new Intl.NumberFormat("uk-UA", {
+                              maximumFractionDigits: 0,
+                            }).format(total);
                           })()}
                         </div>
                         <Button
@@ -1068,7 +1110,7 @@ export default function DashboardPage() {
                       <div className="">
                         <span className="text-muted-foreground">Оренда: </span>
                         <span className="break-words font-black">
-                          ₴{" "}
+                          ₴
                           {(() => {
                             const checkInDate = new Date(rental.checkIn);
                             const checkOutDate = new Date(rental.checkOut);
@@ -1087,7 +1129,12 @@ export default function DashboardPage() {
                             );
 
                             // Загальна сума
-                            return rental.pricePerDay * nights;
+                            const total = rental.pricePerDay * nights;
+
+                            // Форматуємо з пробілом тисяч
+                            return new Intl.NumberFormat("uk-UA", {
+                              maximumFractionDigits: 0,
+                            }).format(total);
                           })()}
                         </span>
                       </div>
