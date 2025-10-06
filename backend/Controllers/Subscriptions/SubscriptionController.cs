@@ -3,6 +3,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace backend.Controllers
 {
@@ -11,19 +12,24 @@ namespace backend.Controllers
     public class SubscriptionController : ControllerBase
     {
         private readonly SubscriptionService _subscriptionService;
+        private readonly IMapper _mapper;
 
-        public SubscriptionController(SubscriptionService subscriptionService)
+        public SubscriptionController(SubscriptionService subscriptionService, IMapper mapper)
         {
             _subscriptionService = subscriptionService;
+            _mapper = mapper;
         }
 
-        // Повертає всі абонементи
         [HttpGet("allSubscription")]
         [SwaggerOperation(Summary = "Повертає всі абонементи")]
         public async Task<IActionResult> GetAllSubscriptions()
         {
             var subscriptions = await _subscriptionService.GetAllSubscriptionsAsync();
-            return Ok(subscriptions);
+
+            // Мапимо через AutoMapper
+            var resultDtos = _mapper.Map<List<SubscriptionDto>>(subscriptions);
+
+            return Ok(resultDtos);
         }
     }
 }

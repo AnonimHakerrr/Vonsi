@@ -3,6 +3,7 @@ using backend.DTOs.Subscribers;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using AutoMapper;
 
 namespace backend.Controllers.Equipment
 {
@@ -12,10 +13,12 @@ namespace backend.Controllers.Equipment
     public class SubscribersController : ControllerBase
     {
         private readonly SubscribersService _subscribersService;
+        private readonly IMapper _mapper;
 
-        public SubscribersController(SubscribersService subscribersService)
+        public SubscribersController(SubscribersService subscribersService, IMapper mapper)
         {
             _subscribersService = subscribersService;
+            _mapper = mapper;
         }
 
         [HttpPost("addSubscription")]
@@ -30,15 +33,13 @@ namespace backend.Controllers.Equipment
 
             var newSub = await _subscribersService.AddSubscriberAsync(dto, userId);
 
+            // Мапимо через AutoMapper замість ручного формування об'єкта
+            var resultDto = _mapper.Map<SubscribersDto>(newSub);
+
             return Ok(new
             {
                 message = "Subscription added successfully",
-                id = newSub.Id,
-                subscriptionId = newSub.SubscriptionId,
-                startDate = newSub.StartDate,
-                endDate = newSub.EndDate,
-                status = newSub.Status,
-                createdAt = newSub.CreatedAt
+                subscription = resultDto
             });
         }
     }
