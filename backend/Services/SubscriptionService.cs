@@ -14,11 +14,9 @@ namespace backend.Services
 
         public SubscriptionService(MongoDbService db)
         {
-            // Колекція абонементів
             _subscriptions = db.GetCollection<Subscription>("Subscription");
         }
 
-        // Повертає всі абонементи
         public async Task<List<SubscriptionDto>> GetAllSubscriptionsAsync()
         {
             var subs = await _subscriptions.Find(_ => true).ToListAsync();

@@ -1,6 +1,6 @@
 using AutoMapper;
-using backend.Models;             // модель Subscribers
-using backend.DTOs.Subscribers;  // тут SubscribersDto
+using backend.Models;            
+using backend.DTOs.Subscribers;  
 
 namespace backend.Helpers
 {
@@ -8,7 +8,6 @@ namespace backend.Helpers
     {
         public SubscribersProfile()
         {
-            // Мапування Subscribers -> SubscribersDto
             CreateMap<Subscribers, SubscribersDto>();
         }
     }

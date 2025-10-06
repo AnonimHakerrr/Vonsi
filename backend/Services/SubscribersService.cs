@@ -16,10 +16,12 @@ namespace backend.Services
             _subscribers = _db.GetCollection<Subscribers>("UserSubscription");
         }
 
-        public async Task<Subscribers> AddSubscriberAsync(SubscribersDto dto)
+        // Додати абонемент для конкретного користувача
+        public async Task<Subscribers> AddSubscriberAsync(SubscribersDto dto, string userId)
         {
             var newSub = new Subscribers
             {
+                UserId = userId,
                 SubscriptionId = dto.SubscriptionId,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
@@ -29,6 +31,12 @@ namespace backend.Services
 
             await _subscribers.InsertOneAsync(newSub);
             return newSub;
+        }
+
+        // Отримати всі абонементи конкретного користувача
+        public async Task<List<Subscribers>> GetSubscriptionsByUserIdAsync(string userId)
+        {
+            return await _subscribers.Find(s => s.UserId == userId).ToListAsync();
         }
     }
 }

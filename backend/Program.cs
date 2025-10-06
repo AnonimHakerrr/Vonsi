@@ -25,6 +25,9 @@ builder.Services.AddSingleton<BookingService>();
 builder.Services.AddSingleton<RoomService>();
 builder.Services.AddSingleton<EquipmentService>();
 builder.Services.AddSingleton<SubscriptionService>();
+builder.Services.AddSingleton<SubscribersService>();
+builder.Services.AddSingleton<UserSubscriptionsService>();
+
 
 // ===== JWT Authentication =====
 var key = Encoding.UTF8.GetBytes(
