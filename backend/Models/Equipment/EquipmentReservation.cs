@@ -7,7 +7,7 @@ namespace backend.Models
     {
         [BsonElement("id")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string EquipmentVId { get; set; } = null!;
+        public string? EquipmentVId { get; set; } = null!;
         [BsonElement("quantity")]
         public int Quantity { get; set; }
     }

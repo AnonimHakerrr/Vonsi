@@ -25,16 +25,25 @@ namespace backend.Controllers.EquipmentRental
             return Ok(equipments);
 
         }
-        
+
         [Authorize]
         [HttpPost("reserveEquipment")]
         public async Task<IActionResult> ReserveEquipment([FromBody] EquipmentReservationDto dto)
         {
-             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _equipmentService.CreateEquipmentReservationAsync(dto, userId);
-                if (!result.Success)
-                    return BadRequest(new { message = result.Message });
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
             return Ok(result.Data);
+        }
+
+        [HttpGet("getUserReservations")]
+        [Authorize]
+        public async Task<IActionResult> GetUserReservations()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var reservations = await _equipmentService.GetUserReservationsAsync(userId);
+            return Ok(reservations);
         }
     }
 }

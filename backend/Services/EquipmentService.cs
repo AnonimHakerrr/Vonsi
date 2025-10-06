@@ -173,7 +173,55 @@ namespace backend.Services
             return ServiceResult<EquipmentReservationDto>.Ok(dto);
         }
 
+        public async Task<List<EquipmentsUserDto>> GetUserReservationsAsync(string? userId)
+        {
+            var reservations = await _reservations
+                .Find(r => r.UserId == userId && r.Status == "reserved")
+                .ToListAsync();
 
+            if (!reservations.Any())
+                return new List<EquipmentsUserDto>();
+
+            // Завантажуємо всі варіанти, які зустрічаються у резерваціях
+            var allVariantIds = reservations
+                .SelectMany(r => r.EquipmentVId)
+                .Select(eq => eq.EquipmentVId)
+                .Distinct()
+                .ToList();
+
+            var variants = await _variants
+                .Find(v => allVariantIds.Contains(v.Id))
+                .ToListAsync();
+
+            // Завантажуємо обладнання, яке використовується
+            var allEquipmentIds = variants.Select(v => v.EquipmentId).Distinct().ToList();
+            var equipments = await _equipments
+                .Find(e => allEquipmentIds.Contains(e.Id))
+                .ToListAsync();
+
+            // Створюємо словники для швидкого доступу
+            var variantDict = variants.ToDictionary(v => v.Id);
+            var equipmentDict = equipments.ToDictionary(e => e.Id);
+
+            var result = new List<EquipmentsUserDto>();
+
+            foreach (var res in reservations)
+            {
+                foreach (var eqQuantity in res.EquipmentVId)
+                {
+                    if (!variantDict.TryGetValue(eqQuantity.EquipmentVId, out var variant))
+                        continue;
+                    if (!equipmentDict.TryGetValue(variant.EquipmentId!, out var equipment))
+                        continue;
+
+                    // Мапимо через AutoMapper
+                    var dto = _mapper.Map<EquipmentsUserDto>((res, eqQuantity, variant, equipment));
+                    result.Add(dto);
+                }
+            }
+
+            return result;
+        }
 
     }
 }

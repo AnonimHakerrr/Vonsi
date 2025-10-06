@@ -20,7 +20,7 @@ namespace backend.Helpers
                 .ForMember(dest => dest.AvailableSizes, opt => opt.Ignore())   // ми підраховуємо в сервісі
                 .ForMember(dest => dest.TotalQuantityAvailable, opt => opt.Ignore()); // теж підрахунок у сервісі
 
-           
+
             // Мапінг DTO -> Model для EquipmentsQuantity
             CreateMap<DTOs.EquipmentRental.EquipmentsQuantity, Models.EquipmentsQuantity>()
                 .ForMember(dest => dest.EquipmentVId, opt => opt.MapFrom(src => src.EquipmentVId))
@@ -35,6 +35,17 @@ namespace backend.Helpers
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "reserved"))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.EquipmentVId, opt => opt.MapFrom(src => src.EquipmentVariants));
+
+            CreateMap<(EquipmentReservation reservation, EquipmentsQuantity eqQuantity, EquipmentVariant variant, Equipment equipment), EquipmentsUserDto>()
+         .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.equipment.Type))
+         .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.equipment.Brand))
+         .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.equipment.Description))
+         .ForMember(dest => dest.PricePerDay, opt => opt.MapFrom(src => src.equipment.PricePerDay))
+         .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.variant.Size))
+         .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.eqQuantity.Quantity))
+         .ForMember(dest => dest.CheckIn, opt => opt.MapFrom(src => src.reservation.StartDate))
+         .ForMember(dest => dest.CheckOut, opt => opt.MapFrom(src => src.reservation.EndDate));
+
         }
     }
 }
