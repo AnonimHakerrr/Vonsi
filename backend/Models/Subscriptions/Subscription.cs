@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace backend.Models
 {
@@ -22,7 +23,10 @@ namespace backend.Models
         [BsonElement("durationDays")]
         public int DurationDays { get; set; }
 
-        [BsonElement("isActive")]
-        public bool IsActive { get; set; }
+        [BsonElement("features")]
+        public List<string> Features { get; set; } = new();
+
+        [BsonElement("popular")]
+        public bool Popular { get; set; } = false;
     }
 }

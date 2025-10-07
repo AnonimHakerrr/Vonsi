@@ -1,10 +1,9 @@
 using System.Security.Claims;
+using backend.DTOs.Subscribers;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using AutoMapper;
-using backend.DTOs.Subscribers;
 
 namespace backend.Controllers.Equipment
 {
@@ -13,13 +12,11 @@ namespace backend.Controllers.Equipment
     [Authorize]
     public class UserSubscriptionsController : ControllerBase
     {
-        private readonly SubscribersService _subscribersService;
-        private readonly IMapper _mapper;
+        private readonly UserSubscriptionsService _service;
 
-        public UserSubscriptionsController(SubscribersService subscribersService, IMapper mapper)
+        public UserSubscriptionsController(UserSubscriptionsService service)
         {
-            _subscribersService = subscribersService;
-            _mapper = mapper;
+            _service = service;
         }
 
         [HttpGet("me")]
@@ -32,12 +29,8 @@ namespace backend.Controllers.Equipment
             if (string.IsNullOrEmpty(userId))
                 return BadRequest(new { message = "User id not available in token." });
 
-            var subs = await _subscribersService.GetSubscriptionsByUserIdAsync(userId);
-
-            // Мапимо список через AutoMapper
-            var resultDtos = _mapper.Map<List<SubscribersDto>>(subs);
-
-            return Ok(resultDtos);
+            var subs = await _service.GetUserSubscriptionsForDashboardAsync(userId);
+            return Ok(subs);
         }
     }
 }

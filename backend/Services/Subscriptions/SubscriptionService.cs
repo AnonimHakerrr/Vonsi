@@ -21,14 +21,15 @@ namespace backend.Services
         {
             var subs = await _subscriptions.Find(_ => true).ToListAsync();
 
-            // ручне мапування, щоб не залежати від AutoMapper
             return subs.Select(s => new SubscriptionDto
             {
+                Id = s.Id,
                 Name = s.Name,
                 Description = s.Description,
                 Price = s.Price,
                 DurationDays = s.DurationDays,
-                IsActive = s.IsActive
+                Features = s.Features ?? new List<string>(),
+                Popular = s.Popular
             }).ToList();
         }
     }
