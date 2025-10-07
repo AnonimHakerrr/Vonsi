@@ -24,6 +24,7 @@ namespace backend.Services
             // ручне мапування, щоб не залежати від AutoMapper
             return subs.Select(s => new SubscriptionDto
             {
+                Id = s.Id,
                 Name = s.Name,
                 Description = s.Description,
                 Price = s.Price,
