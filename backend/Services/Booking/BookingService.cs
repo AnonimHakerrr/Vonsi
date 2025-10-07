@@ -1,21 +1,12 @@
 using AutoMapper;
 using backend.Config;
 using backend.DTOs.Booking;
+using backend.DTOs.Services;
 using backend.Models;
 using MongoDB.Driver;
 
 namespace backend.Services
 {
-     public class ServiceResult<T>
-    {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-        public T? Data { get; set; }
-
-        public static ServiceResult<T> Ok(T data) => new ServiceResult<T> { Success = true, Data = data };
-        public static ServiceResult<T> Fail(string message) => new ServiceResult<T> { Success = false, Message = message };
-    }
-
     public class BookingService
     {
         private readonly IMongoCollection<Booking> _booking;
@@ -79,7 +70,7 @@ namespace backend.Services
                 return ServiceResult<BookingResponseDto>.Fail("Room is already booked for this date range.");
 
             var booking = _mapper.Map<Booking>(dto);
-            booking.UserId = userId; // Прив’язка до користувача
+            booking.UserId = userId;
             await _booking.InsertOneAsync(booking);
 
             return ServiceResult<BookingResponseDto>.Ok(_mapper.Map<BookingResponseDto>(booking));

@@ -1,8 +1,8 @@
-using AutoMapper;
-using backend.Models;
+using System.Security.Claims;
+using backend.DTOs.EquipmentRental;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace backend.Controllers.EquipmentRental
 {
@@ -21,20 +21,29 @@ namespace backend.Controllers.EquipmentRental
         [HttpGet("getAllEquipmentAvailable")]
         public async Task<IActionResult> GetAllEquipmentAvailable([FromQuery] DateTime from, [FromQuery] DateTime to)
         {
-           var equipments = await _equipmentService.GetAvailableWithDetailsAsync(from, to);
+            var equipments = await _equipmentService.GetAvailableWithDetailsAsync(from, to);
             return Ok(equipments);
-         
+
         }
 
-        // [HttpGet("{id}")]
-        // public async Task<IActionResult> GetEquipmentById(string id)
-        // {
-        //     var equipment = await _equipmentService.GetEquipmentByIdAsync(id);
-        //     if (equipment == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return Ok(equipment);
-        // }
+        [Authorize]
+        [HttpPost("reserveEquipment")]
+        public async Task<IActionResult> ReserveEquipment([FromBody] EquipmentReservationDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _equipmentService.CreateEquipmentReservationAsync(dto, userId);
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+            return Ok(result.Data);
+        }
+
+        [HttpGet("getUserReservations")]
+        [Authorize]
+        public async Task<IActionResult> GetUserReservations()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var reservations = await _equipmentService.GetUserReservationsAsync(userId);
+            return Ok(reservations);
+        }
     }
 }
