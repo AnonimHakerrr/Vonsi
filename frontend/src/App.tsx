@@ -2,7 +2,7 @@ import HomePage from "./pages/HomePage/Homepage";
 import CabinetPage from "./pages/CabinetPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import BookingPage from "./pages/BookingPage/BookingPage";
-import RentalPage from "./pages/RentalPage";
+import RentalPage from "./pages/RentalPage/RentalPage";
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfUse } from './pages/TermsOfUse'
 

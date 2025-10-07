@@ -38,11 +38,13 @@ import {
   Package,
   Save,
 } from "lucide-react";
-import { skiPasses } from "../Data/mockData";
+//import { skiPasses } from "../Data/mockData";
 import { useUser } from "../store/UseContext";
 import { APP_CONFIG } from "../env";
 import http_api from "../services/http_api";
 import { getToken, type IUser } from "../services/tokenService";
+import { format } from "date-fns";
+import { uk } from "date-fns/locale";
 
 export default function DashboardPage() {
   interface BookingDetails {
@@ -76,12 +78,24 @@ export default function DashboardPage() {
     checkIn: string; // ISO дата у форматі рядка
     checkOut: string; // ISO дата у форматі рядка
   }
+  interface Subscription {
+    subscriptionId: string;
+    name: string;
+    description: string;
+    price: number;
+    durationDays: number;
+    startDate: string;
+    endDate: string;
+    status: string;
+    createdAt: string;
+  }
 
   const [activeTab, setActiveTab] = useState("overview");
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [bookingData, setBookingData] = useState<BookingDetails[]>([]);
   const [rentalData, setRentalData] = useState<EquipmentRental[]>([]);
+  const [subcription, setSubcription] = useState<Subscription[]>([]);
   const months = [
     "січ",
     "лют",
@@ -97,7 +111,7 @@ export default function DashboardPage() {
     "груд",
   ];
 
-  const { user, signOut } = useUser(); 
+  const { user, signOut } = useUser();
   const [editableUserData, setEditableUserData] = useState<IUser>({
     userId: user?.userId || "",
     firstName: user?.firstName || "",
@@ -106,19 +120,19 @@ export default function DashboardPage() {
     phone: user?.phone || "",
     photoUrl: user?.photoUrl || "images.jpg",
   });
-  useEffect(() => {
-  if (settingsModalOpen && user) {
-    setEditableUserData({
-      userId: user.userId || "",
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      photoUrl: user.photoUrl || "images.jpg",
-    });
-  }
-}, [settingsModalOpen, user]);
 
+  useEffect(() => {
+    if (settingsModalOpen && user) {
+      setEditableUserData({
+        userId: user.userId || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        photoUrl: user.photoUrl || "images.jpg",
+      });
+    }
+  }, [settingsModalOpen, user]);
 
   const [fieldErrors, setFieldErrors] = useState({
     firstName: false,
@@ -174,6 +188,30 @@ export default function DashboardPage() {
     fetchRentals();
   }, []);
 
+  useEffect(() => {
+    const fetchRentals = async () => {
+      try {
+        const token = getToken();
+        const response = await http_api.get<Subscription[]>(
+          "api/UserSubscriptions/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setSubcription(response.data);
+        console.log("response.data", response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchRentals();
+  }, []);
+
   const [bookingDetailsModal, setBookingDetailsModal] =
     useState<BookingDetails | null>(null);
 
@@ -216,9 +254,8 @@ export default function DashboardPage() {
         },
       });
 
-
       // 1. Оновлюємо стан локального користувача
-      setEditableUserData(res.data); 
+      setEditableUserData(res.data);
 
       // 2. Закриваємо модалку
       setSettingsModalOpen(false);
@@ -235,7 +272,7 @@ export default function DashboardPage() {
   const rental = rentalDetailsModal;
 
   //створює pdf для абонементів
-  const generatePDF = async (pass: (typeof skiPasses)[0]) => {
+  const generatePDF = async (pass: Subscription) => {
     const container = document.createElement("div");
     container.style.width = "500px";
     container.style.padding = "20px";
@@ -247,7 +284,7 @@ export default function DashboardPage() {
     container.style.textAlign = "center";
 
     const logoSvg = `
-  <div style="margin-bottom:20px; width:150px; height:150px; margin:0 auto;">
+  <div style="margin-bottom:20px; margin-top:40px; width:300px; height:300px; margin:0 auto;">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" style="width:100%; height:100%;">
       <g fill="#FACC15" stroke="none">
         <path d="M 690 825 L 690 833 L 691 834 L 691 836 L 706 836 L 707 837 L 707 884 L 708 885 L 720 885 L 720 837 L 721 836 L 737 836 L 737 825 Z" />
@@ -280,18 +317,35 @@ export default function DashboardPage() {
 
     container.innerHTML = `
     ${logoSvg}
-    <h1 style="font-size:24px; margin:10px 0; color:#FACC15;">VONSI RESORT</h1>
-    <div style="font-size:16px; text-align:left; padding: 0 20px;">
-      <p><strong>${pass.name}</strong></p>
-      <p>Тип: ${pass.type}</p>
-      <p>Термін дії: ${pass.validFrom} - ${pass.validTo}</p>
-      <p>Статус: <span style="color:#FACC15; font-weight:700;">${
-        pass.status === "active" ? "Активний" : "Використаний"
-      }</span></p>
-      <p>QR: ${pass.qrCode}</p>
-      <p>Ціна: ${pass.price}</p>
-      <p>Кількість: 1</p>
-      <p>Загальна сума: <span style="color:#FACC15; font-weight:700;">${
+    <h1 style="font-size:48px; margin-bottom:40px; color:#FACC15;">VONSI RESORT</h1>
+    <div style="font-size:16px; text-align:left; padding:0 20px;">
+      <p style="font-size:32px; text-align:center;"><strong>${
+        pass.name
+      }</strong></p>
+      <p style="font-size:28px; display:flex; justify-content:space-between;"><span>Тривалість:</span> <span>${
+        pass.durationDays
+      }${
+      pass.durationDays === 1
+        ? "день"
+        : pass.durationDays >= 2 && pass.durationDays <= 4
+        ? "дні"
+        : "днів"
+    }</span></p>
+      <p style="font-size:20px; display:flex; justify-content:space-between;"><span>З ${
+        pass.startDate
+          ? format(new Date(pass.startDate), "d MMMM yyyy", { locale: uk })
+          : ""
+      }</span> <span>До ${
+      pass.startDate
+        ? format(new Date(pass.endDate), "d MMMM yyyy", { locale: uk })
+        : ""
+    }</span></p>
+      <p style="font-size:28px; display:flex; justify-content:space-between;"><span>Статус:</span> <span style="color:#FACC15; font-weight:700;">${
+        new Date(pass.endDate) >= new Date() ? "Активний" : "Використаний"
+      }
+</span></p>
+      <div style="height:3px; background-color:#FACC15; width:100%; margin:8px 0;"></div>
+      <p style="font-size:32px; font-weight:700; display:flex; justify-content:space-between;"><span>Загальна сума:</span> <span style="color:#FACC15; font-weight:900;">₴${
         pass.price
       }</span></p>
     </div>
@@ -299,16 +353,21 @@ export default function DashboardPage() {
 
     document.body.appendChild(container);
 
-    const canvas = await html2canvas(container, { scale: 2 });
+    // html2canvas без масштабу 2 — підлаштуємо під контент
+    const canvas = await html2canvas(container, { scale: 2, useCORS: true });
     const imgData = canvas.toDataURL("image/png");
+
+    // Розміри PDF рівно під контент
+    const pdfWidth = 500;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "px",
-      format: [canvas.width, canvas.height],
+      format: [pdfWidth, pdfHeight],
     });
 
-    doc.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+    doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     doc.save(`${pass.name.replace(/\s/g, "_")}.pdf`);
 
     document.body.removeChild(container);
@@ -374,6 +433,43 @@ export default function DashboardPage() {
   };
 
   let totalMoneyInSeson = getTotalMoneyInSeason(bookingData, rentalData);
+
+  //Сортування бронювань користувача
+  const sortedBookingData = bookingData.slice().sort((a, b) => {
+    const now = new Date();
+
+    const aActive = new Date(a.checkOut) >= now;
+    const bActive = new Date(b.checkOut) >= now;
+
+    // Активні броні спочатку
+    if (aActive && !bActive) return -1;
+    if (!aActive && bActive) return 1;
+
+    // Якщо обидва активні, сортуємо по даті початку (checkIn) від ранніх до пізніх
+    if (aActive && bActive)
+      return new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime();
+
+    // Якщо обидва неактивні, залишаємо порядок як є або сортуємо по checkOut від нових до старих
+    return new Date(b.checkOut).getTime() - new Date(a.checkOut).getTime();
+  });
+
+  const sortedRentals = rentalData.slice().sort((a, b) => {
+    const now = new Date();
+
+    const aActive = new Date(a.checkIn) >= now;
+    const bActive = new Date(b.checkOut) >= now;
+
+    // Активні оренди спочатку
+    if (aActive && !bActive) return -1;
+    if (!aActive && bActive) return 1;
+
+    // Якщо обидві активні, сортуємо по даті початку
+    if (aActive && bActive)
+      return new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime();
+
+    // Якщо обидві минулі, сортуємо по даті закінчення від нових до старих
+    return new Date(b.checkOut).getTime() - new Date(a.checkOut).getTime();
+  });
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -521,7 +617,7 @@ export default function DashboardPage() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 ">
             <div className="grid md:grid-cols-3 gap-6">
-              <Card>
+              <Card className="hover:scale-[1.05] transition-transform duration-300">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-yellow-400" />
@@ -549,7 +645,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="hover:scale-[1.05] transition-transform duration-300">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Snowflake className="h-5 w-5 text-yellow-400" />
@@ -564,7 +660,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="hover:scale-[1.05] transition-transform duration-300">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <CreditCard className="h-5 w-5 text-yellow-400" />
@@ -636,16 +732,27 @@ export default function DashboardPage() {
 
             {/* Список бронювань */}
             <div className="space-y-4">
-              {bookingData.map((booking, index) => (
-                <Card key={index}>
+              {sortedBookingData.map((booking, index) => (
+                <Card
+                  key={index}
+                  className="hover:scale-[1.03] transition-transform duration-300"
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       {/* Ліва частина */}
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge variant="outline">{booking.room.type}</Badge>
-                          <Badge className={"bg-green-100 text-green-800"}>
-                            {"Підтверджено"}
+                          <Badge
+                            className={
+                              new Date(booking.checkOut) < new Date()
+                                ? "bg-blue-100 text-blue-800" // якщо пройшло
+                                : "bg-green-100 text-green-800" // якщо ще дійсне
+                            }
+                          >
+                            {new Date(booking.checkOut) < new Date()
+                              ? "Пройшло"
+                              : "Підтверджено"}
                           </Badge>
                         </div>
                         <h3 className="text-lg font-semibold mb-1">
@@ -731,8 +838,11 @@ export default function DashboardPage() {
 
             {/* Список оренд */}
             <div className="space-y-4">
-              {rentalData.map((rental, index) => (
-                <Card key={index}>
+              {sortedRentals.map((rental, index) => (
+                <Card
+                  key={index}
+                  className="hover:scale-[1.03] transition-transform duration-300"
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       {/* Ліва частина */}
@@ -754,7 +864,14 @@ export default function DashboardPage() {
                           </Badge>
                         </div>
                         <h3 className="text-lg font-semibold mb-1">
-                          {rental.type}
+                          {{
+                            ski: "Лижі",
+                            snowboard: "Сноуборд",
+                            boots: "Черевики",
+                            helmet: "Шолом",
+                            suit: "Костюм",
+                          }[rental.type] || rental.type}{" "}
+                          {rental.brand}
                         </h3>
                         <div className="flex items-center gap-1 text-muted-foreground text-sm">
                           <Calendar className="h-4 w-4" />
@@ -828,33 +945,49 @@ export default function DashboardPage() {
 
             {/* Список абонементів */}
             <div className="space-y-4">
-              {skiPasses.map((pass) => (
-                <Card key={pass.id}>
+              {subcription.map((pass, index) => (
+                <Card
+                  key={index}
+                  className="hover:scale-[1.05] transition-transform duration-300"
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       {/* Ліва частина */}
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <Badge variant="outline">{pass.type}</Badge>
+                          <Badge variant="outline">
+                            {pass.durationDays}{" "}
+                            {pass.durationDays === 1
+                              ? "день"
+                              : pass.durationDays >= 2 && pass.durationDays <= 4
+                              ? "дні"
+                              : "днів"}
+                          </Badge>
                           <Badge
                             className={
-                              pass.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
+                              new Date(pass.endDate) >= new Date()
+                                ? "bg-green-100 text-green-800 px-2 py-1 rounded"
+                                : "bg-gray-100 text-gray-800 px-2 py-1 rounded"
                             }
                           >
-                            {pass.status === "active"
+                            {new Date(pass.endDate) >= new Date()
                               ? "Активний"
                               : "Використаний"}
                           </Badge>
                         </div>
                         <h3 className="text-lg font-semibold mb-1">
-                          {pass.name}
+                          {pass.name} абонемент
                         </h3>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-muted-foreground text-sm">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            {pass.validFrom} - {pass.validTo}
+                            {(() => {
+                              const start = new Date(pass.startDate);
+                              const end = new Date(pass.endDate);
+                              return `${start.getDate()} ${
+                                months[start.getMonth()]
+                              } - ${end.getDate()} ${months[end.getMonth()]}`;
+                            })()}
                           </div>
                         </div>
                       </div>
@@ -862,7 +995,7 @@ export default function DashboardPage() {
                       {/* Права частина */}
                       <div className="flex flex-col items-center md:items-end text-center md:text-right">
                         <div className="text-2xl font-bold mb-2">
-                          {pass.price}
+                          ₴{pass.price.toLocaleString("uk-UA")}
                         </div>
                         <Button
                           variant="outline"
@@ -887,7 +1020,7 @@ export default function DashboardPage() {
         open={!!bookingDetailsModal}
         onOpenChange={() => setBookingDetailsModal(null)}
       >
-        <DialogContent className="sm:max-w-2xl bg-white">
+        <DialogContent className="w-full max-w-full sm:max-w-2xl mx-2 bg-white max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="!font-semibold">
               Деталі бронювання
@@ -903,8 +1036,16 @@ export default function DashboardPage() {
                 <h3 className="text-xl !font-semibold">
                   {bookingDetailsModal.room.title}
                 </h3>
-                <Badge className={"bg-green-100 text-green-800"}>
-                  "Підтверджено"
+                <Badge
+                  className={
+                    new Date(bookingDetailsModal.checkOut) < new Date()
+                      ? "bg-blue-100 text-blue-800" // якщо пройшло
+                      : "bg-green-100 text-green-800" // якщо ще дійсне
+                  }
+                >
+                  {new Date(bookingDetailsModal.checkOut) < new Date()
+                    ? "Пройшло"
+                    : "Підтверджено"}
                 </Badge>
               </div>
 
@@ -1006,6 +1147,7 @@ export default function DashboardPage() {
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">За ніч:</span>
                           <span>
+                            ₴
                             {bookingDetailsModal.room.pricePerNight.toLocaleString(
                               "uk-UA"
                             )}
@@ -1014,6 +1156,7 @@ export default function DashboardPage() {
                         <div className="flex justify-between font-semibold">
                           <span>Загалом:</span>
                           <span>
+                            ₴
                             {(
                               ((new Date(
                                 bookingDetailsModal.checkOut
@@ -1060,7 +1203,16 @@ export default function DashboardPage() {
           {rental ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl !font-bold">{rental.type}</h3>
+                <h3 className="text-xl !font-bold">
+                  {{
+                    ski: "Лижі",
+                    snowboard: "Сноуборд",
+                    boots: "Черевики",
+                    helmet: "Шолом",
+                    suit: "Костюм",
+                  }[rental.type] || rental.type}{" "}
+                  {rental.brand}
+                </h3>
                 <Badge
                   className={
                     new Date(rental.checkOut).setHours(0, 0, 0, 0) >=
@@ -1084,17 +1236,24 @@ export default function DashboardPage() {
                       <Package className="h-5 w-5 text-yellow-400" /> Обладнання
                     </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Назва: </span>
                         <span className="break-words">
-                          {rental.type + " " + rental.brand}
+                          {{
+                            ski: "Лижі",
+                            snowboards: "Сноуборд",
+                            boots: "Черевики",
+                            helmets: "Шолом",
+                            suit: "Костюм",
+                          }[rental.type] || rental.type}{" "}
+                          {rental.brand}
                         </span>
                       </div>
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Розмір: </span>
                         <span className="break-words">{rental.size}</span>
                       </div>
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Стан: </span>
                         <span>Відмінний</span>
                       </div>
@@ -1107,7 +1266,7 @@ export default function DashboardPage() {
                       Вартість
                     </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Оренда: </span>
                         <span className="break-words font-black">
                           ₴
@@ -1138,7 +1297,7 @@ export default function DashboardPage() {
                           })()}
                         </span>
                       </div>
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Застава: </span>
                         <span className="break-words">
                           ₴2,000 (повернеться після здачі)
@@ -1175,11 +1334,11 @@ export default function DashboardPage() {
 
                   <div>
                     <h5 className="font-semibold mb-2 flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-yellow-400" /> Час
+                      <Clock className="h-5 w-5 text-yellow-400" /> Дата
                       видачі/повернення
                     </h5>
                     <div className="space-y-2 text-sm">
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Видача: </span>
                         <span className="break-words">
                           {(() => {
@@ -1195,7 +1354,7 @@ export default function DashboardPage() {
                           })()}
                         </span>
                       </div>
-                      <div className="">
+                      <div className="flex justify-between">
                         <span className="text-muted-foreground">
                           Повернення:{" "}
                         </span>
@@ -1243,7 +1402,7 @@ export default function DashboardPage() {
 
           <div className="space-y-4 flex flex-col ">
             {/* Аватарка */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center gap-4">
               <img
                 src={
                   editableUserData.photoUrl?.startsWith("data:")
@@ -1253,7 +1412,7 @@ export default function DashboardPage() {
                 alt={user?.firstName}
                 className="w-16 h-16 rounded-full object-cover border-3 border-yellow-400"
               />
-              <label className="cursor-pointer px-2 py-1 bg-yellow-400 text-black rounded-lg  hover:bg-yellow-500">
+              <label className="text-sm cursor-pointer px-2 py-1 bg-yellow-400 text-black rounded-lg  hover:bg-yellow-500">
                 Змінити аватар
                 <input
                   type="file"

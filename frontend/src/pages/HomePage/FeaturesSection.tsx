@@ -5,7 +5,7 @@ export default function FeaturesSection() {
   return (
     <section className="py-20 px-6">
       <div className="max-w-7xl mx-auto grid gap-8 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
-        <Card className="border-2 hover:border-yellow-400 transition-colors">
+        <Card className="border-2 hover:border-yellow-400 transition-colors hover:scale-[1.05] transition-transform duration-300">
           <CardContent className="p-8 text-center">
             <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
               <Mountain className="h-10 w-10 text-black" />
@@ -17,7 +17,7 @@ export default function FeaturesSection() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:border-yellow-400 transition-colors">
+        <Card className="border-2 hover:border-yellow-400 transition-colors hover:scale-[1.05] transition-transform duration-300">
           <CardContent className="p-8 text-center">
             <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
               <Snowflake className="h-10 w-10 text-black" />
@@ -29,7 +29,7 @@ export default function FeaturesSection() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:border-yellow-400 transition-colors">
+        <Card className="border-2 hover:border-yellow-400 transition-colors hover:scale-[1.05] transition-transform duration-300">
           <CardContent className="p-8 text-center">
             <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
               <Star className="h-10 w-10 text-black" />

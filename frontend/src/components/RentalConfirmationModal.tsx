@@ -56,7 +56,6 @@ export const RentalConfirmationModal: React.FC<
   const [paymentMethod, setPaymentMethod] = useState("card");
   const navigate = useNavigate();
 
-
   const handleInputChange = (field: string, value: string) => {
     setCustomerData((prev) => ({ ...prev, [field]: value }));
   };
@@ -103,7 +102,7 @@ export const RentalConfirmationModal: React.FC<
 
       if (response.status === 200) {
         alert("Оренда успішно оформлена! Ви отримаєте підтвердження на email.");
-        navigate("/dashboard"); 
+        navigate("/dashboard");
         onClose();
       } else {
         throw new Error("Не вдалося створити бронювання обладнання");
@@ -214,10 +213,17 @@ export const RentalConfirmationModal: React.FC<
                   />
                   <div className="flex-1 w-full sm:w-auto">
                     <div className="font-medium text-sm sm:text-base">
-                      {item.type}
+                      {{
+                        ski: "Лижі",
+                        snowboard: "Сноуборд",
+                        boots: "Черевики",
+                        helmet: "Шолом",
+                        suit: "Костюм",
+                      }[item.type] || item.type}{" "}
+                      {item.brand}
                     </div>
                     <div className="text-xs sm:text-sm text-muted-foreground">
-                      {item.brand}{" "}
+                      {"Розмір "}{" "}
                       {item.selectedSize && `• ${item.selectedSize}`}
                     </div>
                   </div>

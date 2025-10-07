@@ -12,15 +12,15 @@ export default function ContactSection() {
             Зв'яжіться з нами для бронювання або отримання додаткової інформації
           </p>
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 hover:scale-[1.02] transition-transform duration-300">
               <MapPin className="h-5 w-5 text-yellow-400" />
               <span>Карпати, Україна</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 hover:scale-[1.02] transition-transform duration-300">
               <Phone className="h-5 w-5 text-yellow-400" />
               <span>+380 (67) 123-45-67</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 hover:scale-[1.02] transition-transform duration-300">
               <Mail className="h-5 w-5 text-yellow-400" />
               <span>VONSI_RESORT@gmail.com</span>
             </div>

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 import { skiPassess } from "../Data/mockData";
-
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import {
   Card,
@@ -14,13 +14,6 @@ import {
 import { Badge } from "../components/Badge";
 import { Calendar } from "../components/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/Select";
 import { SidebarMenu } from "../components/SidebarMenu";
 import { AuthModal } from "../components/AuthModal";
 import {
@@ -28,35 +21,90 @@ import {
   CalendarIcon,
   Users,
   Clock,
-  Check,
   Star,
   Snowflake,
+  Check,
 } from "lucide-react";
+import type { ISubscription } from "./SubscriptionPage/types";
+import http_api from "../services/http_api";
+import { getToken } from "../services/tokenService";
+
+interface Pass {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  durationDays: number;
+  features: string[];
+  popular: boolean;
+}
 
 export default function SkiPassesPage() {
-  const [selectedPass, setSelectedPass] = useState<string>("");
+  const [selectedPass, setSelectedPass] = useState<Pass | null>(null);
+
+
   const [startDate, setStartDate] = useState<Date>();
-  const [quantity, setQuantity] = useState("1");
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [substription, setSubstription] = useState<ISubscription[]>([]);
 
-  const handlePurchase = () => {
-    const pass = skiPassess.find((p) => p.id === selectedPass);
-    if (!pass) return;
+  useEffect(() => {
+    const fetchRentals = async () => {
+      try {
+        const response = await http_api.get<ISubscription[]>(
+          "api/Subscription/allSubscription"
+        );
 
-    console.log("Ski pass purchase:", {
-      pass: selectedPass,
-      startDate,
-      quantity,
-      total: pass.price * Number.parseInt(quantity),
-    });
+        setSubstription(response.data);
+        console.log("response.data", response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-    alert("Абонемент успішно придбано!");
-  };
+    fetchRentals();
+  }, []);
 
-  const calculateTotal = () => {
-    const pass = skiPassess.find((p) => p.id === selectedPass);
-    return pass ? pass.price * Number.parseInt(quantity) : 0;
+  const handlePurchase = async () => {
+    if (!startDate || !selectedPass) {
+      alert("Будь ласка, оберіть дати та обладнання для оренди.");
+      return;
+    }
+    const token = getToken();
+
+    const end = new Date(startDate);
+    end.setDate(startDate.getDate() + selectedPass.durationDays - 1);
+    console.log("Дата початку", startDate.toISOString());
+    console.log("Дата кінця", end.toISOString());
+    const payload = {
+      subscriptionId: selectedPass.id,
+      startDate: startDate.toISOString(),
+      endDate: end.toISOString(),
+    };
+
+    try { 
+      const response = await http_api.post(
+        "api/Subscribers/addSubscription",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      ); 
+
+      if (response.status === 200) {
+        alert("Абонемент успішно придбаний");
+        navigate("/dashboard");
+      } else {
+        throw new Error("Не вдалося створити бронювання обладнання");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Не вдалося створити бронювання. Спробуйте пізніше.");
+    }
   };
 
   return (
@@ -89,15 +137,15 @@ export default function SkiPassesPage() {
 
           {/* Ski Pass Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {skiPassess.map((pass) => (
+            {substription.map((pass, index) => (
               <Card
                 key={pass.id}
-                className={`relative border-2 cursor-pointer transition-all hover:shadow-lg ${
-                  selectedPass === pass.id
-                    ? "!border-yellow-400 shadow-lg"
+                className={`relative border-2 cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] transition-transform transition-color duration-300 ${
+                  selectedPass?.id === pass.id
+                    ? "!border-yellow-400 shadow-lg scale-[1.02]"
                     : "border-border hover:border-yellow-200"
                 } ${pass.popular ? "ring-2 ring-yellow-400" : ""}`}
-                onClick={() => setSelectedPass(pass.id)}
+                onClick={() => setSelectedPass(pass)}
               >
                 {pass.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -110,12 +158,25 @@ export default function SkiPassesPage() {
 
                 <CardHeader className="text-center pb-4">
                   <div
-                    className={`w-18 h-18 ${pass.color} rounded-full flex items-center justify-center mx-auto mb-4`}
+                    className={`w-18 h-18 ${
+                      index === 0
+                        ? "bg-blue-500"
+                        : index === 1
+                        ? "bg-yellow-500"
+                        : index === 2
+                        ? "bg-green-500"
+                        : index === 3
+                        ? "bg-purple-500"
+                        : "bg-gray-400"
+                    } rounded-full flex items-center justify-center mx-auto mb-4`}
                   >
                     <Mountain className="h-10 w-10 text-white" />
                   </div>
                   <CardTitle className="text-xl font-bold">
-                    {pass.name} <span className="text-yellow-400 lg:!text-md ">абонемент</span>
+                    {pass.name}{" "}
+                    <span className="text-yellow-400 lg:!text-md ">
+                      абонемент
+                    </span>
                   </CardTitle>
                   <CardDescription className="text-sm">
                     {pass.description}
@@ -123,13 +184,18 @@ export default function SkiPassesPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
+                  <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {pass.durationDays}{" "}
+                    {pass.durationDays === 1
+                      ? "день"
+                      : pass.durationDays >= 2 && pass.durationDays <= 4
+                      ? "дні"
+                      : "днів"}
+                  </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold">
                       ₴{pass.price.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {pass.duration}
                     </div>
                   </div>
 
@@ -147,12 +213,12 @@ export default function SkiPassesPage() {
 
                   <Button
                     className={`w-full rounded-2 font-bold ${
-                      selectedPass === pass.id
+                      selectedPass?.id === pass.id
                         ? "bg-yellow-400 text-black hover:bg-yellow-500"
                         : "bg-transparent font-medium border-yellow-400 text-yellow-600 hover:bg-yellow-50"
                     }`}
                   >
-                    {selectedPass === pass.id ? "Обрано" : "Обрати"}
+                    {selectedPass?.id === pass.id ? "Обрано" : "Обрати"}
                   </Button>
                 </CardContent>
               </Card>
@@ -168,7 +234,7 @@ export default function SkiPassesPage() {
                 </CardTitle>
                 <CardDescription className="text-sm sm:text-base md:text-lg lg:text-base">
                   Вкажіть деталі для придбання:{" "}
-                  {skiPassess.find((p) => p.id === selectedPass)?.name}
+                  {skiPassess.find((p) => p.id === selectedPass.id)?.name}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 w-full">
@@ -212,50 +278,6 @@ export default function SkiPassesPage() {
                       </PopoverContent>
                     </Popover>
                   </div>
-
-                  {/* Quantity */}
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm sm:text-base md:text-base font-medium">
-                      Кількість абонементів
-                    </label>
-                    <Select value={quantity} onValueChange={setQuantity}>
-                      <SelectTrigger className="rounded-2 !font-base bg-transparent w-full">
-                        <SelectValue className="text-sm sm:text-base md:text-base" />
-                      </SelectTrigger>
-                      <SelectContent className="!rounded-2 bg-white">
-                        <SelectItem
-                          className="text-sm sm:text-base md:text-base"
-                          value="1"
-                        >
-                          1 абонемент
-                        </SelectItem>
-                        <SelectItem
-                          className="text-sm sm:text-base md:text-base"
-                          value="2"
-                        >
-                          2 абонементи
-                        </SelectItem>
-                        <SelectItem
-                          className="text-sm sm:text-base md:text-base"
-                          value="3"
-                        >
-                          3 абонементи
-                        </SelectItem>
-                        <SelectItem
-                          className="text-sm sm:text-base md:text-base"
-                          value="4"
-                        >
-                          4 абонементи
-                        </SelectItem>
-                        <SelectItem
-                          className="text-sm sm:text-base md:text-base"
-                          value="5"
-                        >
-                          5 абонементів
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
 
                 {/* Summary */}
@@ -263,21 +285,8 @@ export default function SkiPassesPage() {
                   <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
                     <span>Абонемент:</span>
                     <span>
-                      {skiPassess.find((p) => p.id === selectedPass)?.name}
+                      {skiPassess.find((p) => p.id === selectedPass.id)?.name}
                     </span>
-                  </div>
-                  <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
-                    <span>Ціна за одиниць:</span>
-                    <span>
-                      ₴
-                      {skiPassess
-                        .find((p) => p.id === selectedPass)
-                        ?.price.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
-                    <span>Кількість:</span>
-                    <span>{quantity}</span>
                   </div>
                   {startDate && (
                     <div className="flex justify-between text-sm sm:text-base md:text-lg lg:text-lg">
@@ -290,7 +299,13 @@ export default function SkiPassesPage() {
                   <div className="border-t pt-2">
                     <div className="flex justify-between text-base sm:text-base md:text-lg lg:text-xl font-bold">
                       <span>Загальна сума:</span>
-                      <span>₴{calculateTotal().toLocaleString()}</span>
+                      <span>
+                        ₴
+                        {
+                          substription.find((p) => p.id === selectedPass.id)
+                            ?.price
+                        }
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +315,8 @@ export default function SkiPassesPage() {
                   <Button
                     onClick={handlePurchase}
                     className="w-1/2 sm:w-1/2 md:w-1/2 lg:w-1/2 bg-yellow-400 text-black hover:bg-yellow-500 font-bold rounded-2 text-sm sm:text-base md:!text-sm lg:!text-xl"
-                    disabled={!startDate}>
+                    disabled={!startDate}
+                  >
                     Придбати абонемент
                   </Button>
                 </div>

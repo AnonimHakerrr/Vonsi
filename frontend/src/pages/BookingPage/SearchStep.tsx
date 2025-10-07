@@ -175,9 +175,10 @@ export default function SearchStep({
               {availableRooms.map((room) => (
                 <Card
                   key={room.id}
-                  className={`border-2 ${
+                  className={`border-2 hover:scale-[1.02] duration-300
+${
                     selectedRoom === room.id
-                      ? "border-yellow-400"
+                      ? "border-yellow-400 scale-[1.02]"
                       : "border-border"
                   }`}
                 >
