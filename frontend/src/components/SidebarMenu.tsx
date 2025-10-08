@@ -4,6 +4,7 @@ import { cn } from "../lib/utils";
 import { Button } from "../components/Button";
 import { AuthModal } from "../components/AuthModal";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/Avatar";
+import { useNavigate } from "react-router-dom";
 import {
   Home,
   Calendar,
@@ -21,6 +22,7 @@ export function SidebarMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const navigate = useNavigate();
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -181,7 +183,10 @@ export function SidebarMenu() {
               <div className="relative z-50 p-4">
                 <button
                   className="w-full bg-yellow-400 text-black px-4 py-1 rounded-2 hover:bg-yellow-500 hover:font-semibold transition-colors"
-                  onClick={signOut}
+                  onClick={() => {
+                    signOut();
+                    navigate("/"); // 🔹 перенаправлення на головну
+                  }}
                 >
                   Вийти
                 </button>

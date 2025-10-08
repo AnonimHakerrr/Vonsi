@@ -321,10 +321,10 @@ export default function DashboardPage() {
     <div style="font-size:16px; text-align:left; padding:0 20px;">
       <p style="font-size:32px; text-align:center;"><strong>${
         pass.name
-      }</strong></p>
+      } абонемент</strong></p>
       <p style="font-size:28px; display:flex; justify-content:space-between;"><span>Тривалість:</span> <span>${
         pass.durationDays
-      }${
+      }${" "}${
       pass.durationDays === 1
         ? "день"
         : pass.durationDays >= 2 && pass.durationDays <= 4
@@ -376,63 +376,88 @@ export default function DashboardPage() {
   //Загальна сума за сезон у вкладці огляд
   const getTotalMoneyInSeason = (
     bookingData: BookingDetails[],
-    rentalData: EquipmentRental[]
+    rentalData: EquipmentRental[],
+    subscriptions: Subscription[]
   ): number => {
     const now = new Date();
-    let total = 0;
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    // Перевірка поточного сезону (3 місяці від сьогодні)
+
+    // Визначаємо місяці сезону (три місяці від поточного)
     const seasonMonths = [
       currentMonth,
       (currentMonth + 1) % 12,
       (currentMonth + 2) % 12,
     ];
 
+    let total = 0;
+
+    // --- Оренда ---
     rentalData.forEach((rental) => {
       const checkIn = new Date(rental.checkIn);
       const checkOut = new Date(rental.checkOut);
 
-      // Обнуляємо час, залишаємо тільки день
       checkIn.setHours(0, 0, 0, 0);
       checkOut.setHours(0, 0, 0, 0);
 
-      // Кількість ночей
       const nights = Math.ceil(
         (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      // Вартість за оренду
       const price = rental.pricePerDay * nights;
 
-      const isCurrentSeason =
+      if (
         seasonMonths.includes(checkIn.getMonth()) &&
-        checkIn.getFullYear() === currentYear;
-
-      if (isCurrentSeason) {
+        checkIn.getFullYear() === currentYear
+      ) {
         total += price;
       }
     });
 
+    // --- Бронювання кімнат ---
     bookingData.forEach((booking) => {
       const checkIn = new Date(booking.checkIn);
       const checkOut = new Date(booking.checkOut);
 
-      const price =
-        ((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) *
-        booking.room.pricePerNight;
+      const nights = Math.ceil(
+        (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      const price = nights * booking.room.pricePerNight;
 
-      const isCurrentSeason =
+      if (
         seasonMonths.includes(checkIn.getMonth()) &&
-        checkIn.getFullYear() === currentYear;
-      if (isCurrentSeason) {
+        checkIn.getFullYear() === currentYear
+      ) {
         total += price;
       }
     });
+
+    // --- Абонементи ---
+    subscriptions.forEach((sub) => {
+      const start = new Date(sub.startDate);
+      const end = new Date(sub.endDate);
+
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+
+      // Перевірка чи хоча б один день абонемента у сезоні
+      const current = new Date(start);
+      while (current <= end) {
+        if (
+          seasonMonths.includes(current.getMonth()) &&
+          current.getFullYear() === currentYear
+        ) {
+          total += sub.price;
+          break; // додаємо один раз, навіть якщо абонемент триває декілька днів у сезоні
+        }
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
     return total;
   };
 
-  let totalMoneyInSeson = getTotalMoneyInSeason(bookingData, rentalData);
+  let totalMoneyInSeson = getTotalMoneyInSeason(bookingData, rentalData, subcription);
 
   //Сортування бронювань користувача
   const sortedBookingData = bookingData.slice().sort((a, b) => {
@@ -470,6 +495,66 @@ export default function DashboardPage() {
     // Якщо обидві минулі, сортуємо по даті закінчення від нових до старих
     return new Date(b.checkOut).getTime() - new Date(a.checkOut).getTime();
   });
+
+  function getCurrentSeasonDates(): { seasonStart: Date; seasonEnd: Date } {
+    const now = new Date();
+    const month = now.getMonth() + 1; // getMonth() від 0 до 11
+
+    let seasonStart: Date, seasonEnd: Date;
+
+    if (month >= 3 && month <= 5) {
+      // Весна
+      seasonStart = new Date(now.getFullYear(), 2, 1); // 1 березня
+      seasonEnd = new Date(now.getFullYear(), 4, 31); // 31 травня
+    } else if (month >= 6 && month <= 8) {
+      // Літо
+      seasonStart = new Date(now.getFullYear(), 5, 1);
+      seasonEnd = new Date(now.getFullYear(), 7, 31);
+    } else if (month >= 9 && month <= 11) {
+      // Осінь
+      seasonStart = new Date(now.getFullYear(), 8, 1);
+      seasonEnd = new Date(now.getFullYear(), 10, 30);
+    } else {
+      // Зима (грудень–лютий)
+      if (month === 12) {
+        seasonStart = new Date(now.getFullYear(), 11, 1);
+        seasonEnd = new Date(now.getFullYear() + 1, 1, 28);
+      } else {
+        seasonStart = new Date(now.getFullYear() - 1, 11, 1);
+        seasonEnd = new Date(now.getFullYear(), 1, 28);
+      }
+    }
+
+    return { seasonStart, seasonEnd };
+  }
+
+  /**
+   * Рахує дні абонементів у межах поточного сезону
+   */
+  function calculateSeasonDaysUnique(subscriptions: Subscription[]): number {
+    const { seasonStart, seasonEnd } = getCurrentSeasonDates();
+    const daysSet = new Set<string>();
+
+    subscriptions.forEach((sub) => {
+      const subStart = new Date(sub.startDate);
+      const subEnd = new Date(sub.endDate);
+
+      const effectiveStart = subStart > seasonStart ? subStart : seasonStart;
+      const effectiveEnd = subEnd < seasonEnd ? subEnd : seasonEnd;
+
+      if (effectiveEnd >= effectiveStart) {
+        for (
+          let d = new Date(effectiveStart);
+          d <= effectiveEnd;
+          d.setDate(d.getDate() + 1)
+        ) {
+          daysSet.add(d.toDateString()); // додаємо як рядок, щоб уникнути дублікатів
+        }
+      }
+    });
+
+    return daysSet.size;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -653,7 +738,9 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold mb-2">12</div>
+                  <div className="text-3xl font-bold mb-2">
+                    {calculateSeasonDaysUnique(subcription)}
+                  </div>
                   <p className="text-muted-foreground text-sm">
                     У цьому сезоні
                   </p>
@@ -735,7 +822,7 @@ export default function DashboardPage() {
               {sortedBookingData.map((booking, index) => (
                 <Card
                   key={index}
-                  className="hover:scale-[1.03] transition-transform duration-300"
+                  className="hover:scale-[1.05] transition-transform duration-300"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -841,7 +928,7 @@ export default function DashboardPage() {
               {sortedRentals.map((rental, index) => (
                 <Card
                   key={index}
-                  className="hover:scale-[1.03] transition-transform duration-300"
+                  className="hover:scale-[1.05] transition-transform duration-300"
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
