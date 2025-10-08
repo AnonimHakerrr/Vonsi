@@ -1,5 +1,5 @@
 import HomePage from "./pages/HomePage/Homepage"; 
-import CabinetPage from "./pages/CabinetPage";
+import CabinetPage from "./pages/CabinetPage/CabinetPage";
 import SubscriptionPage from "./pages/SubscriptionPage/SubscriptionPage";
 import BookingPage from "./pages/BookingPage/BookingPage";
 import RentalPage from "./pages/RentalPage/RentalPage";
