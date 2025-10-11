@@ -1,4 +1,4 @@
-import { Card, CardContent } from "../../components/Card"; // шляхи підкоригуй під свій проект
+import { Card, CardContent } from "../../components/Card"; 
 import { Button } from "../../components/Button";
 import { LogIn } from "lucide-react";
 import type { LoginPromptCardProps } from "./types";

@@ -1,9 +1,9 @@
-// SearchStep.tsx
+
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "../../components/Popover"; // підстав свій шлях
+} from "../../components/Popover"; 
 import {
   Card,
   CardHeader,
@@ -22,12 +22,12 @@ import {
   SelectItem,
 } from "../../components/Select";
 
-import { Calendar } from "../../components/Calendar"; // підстав свій шлях
+import { Calendar } from "../../components/Calendar"; 
 import { CalendarIcon, Users } from "lucide-react";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 
-import type { SearchStepProps } from "./type"; // шлях змінюй під себе
+import type { SearchStepProps } from "./type"; 
 
 export default function SearchStep({
   step,

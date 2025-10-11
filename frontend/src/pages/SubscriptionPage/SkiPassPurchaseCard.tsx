@@ -1,4 +1,4 @@
-// src/components/SkiPassPurchaseCard.tsx
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../components/Card";
 import { Button } from "../../components/Button";
 import { Popover, PopoverTrigger, PopoverContent } from "../../components/Popover";

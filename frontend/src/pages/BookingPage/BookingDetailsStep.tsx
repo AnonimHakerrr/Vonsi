@@ -5,7 +5,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/Card"; // імпортуй свої UI компоненти
+} from "../../components/Card"; 
 import { Button } from "../../components/Button";
 import { Label } from "../../components/Label";
 import { Input } from "../../components/Input";

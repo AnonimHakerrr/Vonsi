@@ -3,7 +3,7 @@ import { Card, CardContent } from "../../components/Card";
 import { Badge } from "../../components/Badge";
 import { Button } from "../../components/Button";
 import { Calendar, Eye, Snowflake } from "lucide-react";
-import type { IRentalsTabProps } from "./types"; // визначений тип для оренди
+import type { IRentalsTabProps } from "./types"; 
 
 
 

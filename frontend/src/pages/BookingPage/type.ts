@@ -59,3 +59,7 @@ export interface BookingConfirmationStepProps {
   calculateTotal: () => number;
   handleBooking: () => void;
 }
+
+export interface BookingStepsProps {
+  step: number;
+}

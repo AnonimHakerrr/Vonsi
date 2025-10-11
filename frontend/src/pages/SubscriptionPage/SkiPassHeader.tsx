@@ -1,6 +1,6 @@
 
 import { Snowflake } from "lucide-react";
-import { Badge } from "../../components/Badge"; // переконайся, що шлях правильний
+import { Badge } from "../../components/Badge"; 
 import type { ISkiPassHeaderProps } from "./types";
 
 

@@ -1,4 +1,4 @@
-// src/pages/BookingPage.tsx
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";

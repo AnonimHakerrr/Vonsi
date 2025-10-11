@@ -1,10 +1,8 @@
 // src/components/BookingSteps.tsx
 import React from "react";
 import { Check } from "lucide-react";
+import type { BookingStepsProps } from "./type";
 
-interface BookingStepsProps {
-  step: number;
-}
 
 export const BookingSteps: React.FC<BookingStepsProps> = ({ step }) => {
   return (

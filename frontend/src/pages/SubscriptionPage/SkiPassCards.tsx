@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../..
 import { Badge } from "../../components/Badge";
 import { Mountain, Clock, Star, Check } from "lucide-react";
 import { Button } from "../../components/Button";
-import type { ISkiPassCardsProps } from "./types"; // або там, де у тебе описан тип
+import type { ISkiPassCardsProps } from "./types"; 
 
 
 

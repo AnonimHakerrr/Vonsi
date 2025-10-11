@@ -1,5 +1,3 @@
-// src/components/RentalCategoryCard.tsx
-"use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/Card";
 import { Button } from "../../components/Button";
