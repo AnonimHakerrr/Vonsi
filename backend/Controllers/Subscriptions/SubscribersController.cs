@@ -24,6 +24,8 @@ namespace backend.Controllers.Equipment
         [HttpPost("addSubscription")]
         public async Task<IActionResult> AddSubscription([FromBody] SubscribersDto dto)
         {
+             Console.WriteLine(dto.StartDate);
+            Console.WriteLine(dto.EndDate);
             var userId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                          ?? User?.FindFirst("id")?.Value
                          ?? User?.FindFirst("sub")?.Value;

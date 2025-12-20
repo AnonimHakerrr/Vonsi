@@ -19,6 +19,8 @@ namespace backend.Services
         // Додати абонемент для конкретного користувача
         public async Task<Subscribers> AddSubscriberAsync(SubscribersDto dto, string userId)
         {
+            Console.WriteLine(dto.StartDate);
+            Console.WriteLine(dto.EndDate);
             var newSub = new Subscribers
             {
                 UserId = userId,
