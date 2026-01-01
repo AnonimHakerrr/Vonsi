@@ -13,4 +13,4 @@ namespace backend.DTOs.Subscriptions
         public bool Popular { get; set; }
     }
 }
-
+// These are recently edited files. Do not suggest code that has been deleted.
